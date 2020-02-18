@@ -73,6 +73,13 @@
                                 <div class="widget-title am-fl">规格/库存</div>
                             </div>
                             <div class="am-form-group">
+                                <label class="am-u-sm-3 am-u-lg-2 am-form-label">初始销量</label>
+                                <div class="am-u-sm-9 am-u-end">
+                                    <input type="number" class="tpl-form-input" name="goods[sales_initial]"
+                                           value="<?= $model['sales_initial'] ?>">
+                                </div>
+                            </div>
+                            <div class="am-form-group">
                                 <label class="am-u-sm-3 am-u-lg-2 am-form-label form-require">商品规格 </label>
                                 <div class="am-u-sm-9 am-u-end">
                                     <label class="am-radio-inline">
@@ -175,10 +182,10 @@
                                     </div>
                                 </div>
                                 <div class="am-form-group">
-                                    <label class="am-u-sm-3 am-u-lg-2 am-form-label">商品划线价 </label>
+                                    <label class="am-u-sm-3 am-u-lg-2 am-form-label form-require">商品划线价 </label>
                                     <div class="am-u-sm-9 am-u-end">
                                         <input type="number" class="tpl-form-input" name="goods[spec][line_price]"
-                                               value="<?= $model['spec'][0]['line_price'] ?>">
+                                               value="<?= $model['spec'][0]['line_price'] ?>" required>
                                     </div>
                                 </div>
                                 <div class="am-form-group">
@@ -189,7 +196,7 @@
                                     </div>
                                 </div>
                                 <div class="am-form-group">
-                                    <label class="am-u-sm-3 am-u-lg-2 am-form-label form-require">商品重量(Kg) </label>
+                                    <label class="am-u-sm-3 am-u-lg-2 am-form-label">商品重量(Kg) </label>
                                     <div class="am-u-sm-9 am-u-end">
                                         <input type="number" class="tpl-form-input" name="goods[spec][goods_weight]"
                                                value="<?= $model['spec'][0]['goods_weight'] ?>" required>
@@ -197,7 +204,7 @@
                                 </div>
                             </div>
 
-                            <div class="am-form-group">
+                            <!-- <div class="am-form-group">
                                 <label class="am-u-sm-3 am-u-lg-2 am-form-label form-require">库存计算方式 </label>
                                 <div class="am-u-sm-9 am-u-end">
                                     <label class="am-radio-inline">
@@ -211,7 +218,7 @@
                                         付款减库存
                                     </label>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <div class="widget-head am-cf">
                                 <div class="widget-title am-fl">商品详情</div>
@@ -223,10 +230,10 @@
                                     <textarea id="container" name="goods[content]"><?= $model['content'] ?></textarea>
                                 </div>
                             </div>
-                            <div class="widget-head am-cf">
+                            <!-- <div class="widget-head am-cf">
                                 <div class="widget-title am-fl">其他</div>
-                            </div>
-                            <div class="am-form-group">
+                            </div> -->
+                            <!-- <div class="am-form-group">
                                 <label class="am-u-sm-3 am-u-lg-2 am-form-label form-require">运费模板 </label>
                                 <div class="am-u-sm-9 am-u-end">
                                     <select name="goods[delivery_id]" required
@@ -243,8 +250,8 @@
                                         <a href="<?= url('setting.delivery/add') ?>">去添加</a>
                                     </small>
                                 </div>
-                            </div>
-                            <div class="am-form-group">
+                            </div> -->
+                            <!-- <div class="am-form-group">
                                 <label class="am-u-sm-3 am-u-lg-2 am-form-label form-require">商品状态 </label>
                                 <div class="am-u-sm-9 am-u-end">
                                     <label class="am-radio-inline">
@@ -258,14 +265,8 @@
                                         下架
                                     </label>
                                 </div>
-                            </div>
-                            <div class="am-form-group">
-                                <label class="am-u-sm-3 am-u-lg-2 am-form-label">初始销量</label>
-                                <div class="am-u-sm-9 am-u-end">
-                                    <input type="number" class="tpl-form-input" name="goods[sales_initial]"
-                                           value="<?= $model['sales_initial'] ?>">
-                                </div>
-                            </div>
+                            </div> -->
+                            <!-- 
                             <div class="am-form-group">
                                 <label class="am-u-sm-3 am-u-lg-2 am-form-label form-require">商品排序 </label>
                                 <div class="am-u-sm-9 am-u-end">
@@ -273,7 +274,7 @@
                                            value="<?= $model['goods_sort'] ?>" required>
                                     <small>数字越小越靠前</small>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="am-form-group">
                                 <div class="am-u-sm-9 am-u-sm-push-3 am-margin-top-lg">
                                     <button type="submit" class="j-submit am-btn am-btn-secondary">提交
