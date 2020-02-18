@@ -196,7 +196,7 @@
                                     </div>
                                 </div>
                                 <div class="am-form-group">
-                                    <label class="am-u-sm-3 am-u-lg-2 am-form-label">商品重量(Kg) </label>
+                                    <label class="am-u-sm-3 am-u-lg-2 am-form-label">商品重量(Kg)/数量(个)</label>
                                     <div class="am-u-sm-9 am-u-end">
                                         <input type="number" class="tpl-form-input" name="goods[spec][goods_weight]"
                                                value="<?= $model['spec'][0]['goods_weight'] ?>" required>
