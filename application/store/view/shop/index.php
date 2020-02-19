@@ -3,7 +3,7 @@
         <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
             <div class="widget am-cf">
                 <div class="widget-head am-cf">
-                    <div class="widget-title am-cf">出售中的商品</div>
+                    <div class="widget-title am-cf">换购中的商品</div>
                 </div>
                 <div class="widget-body am-fr">
                     <div class="am-u-sm-12 am-u-md-6 am-u-lg-6">
@@ -11,7 +11,7 @@
                             <div class="am-btn-toolbar">
                                 <div class="am-btn-group am-btn-group-xs">
                                     <a class="am-btn am-btn-default am-btn-success am-radius"
-                                       href="<?= url('goods/add') ?>">
+                                       href="<?= url('shop/add') ?>">
                                         <span class="am-icon-plus"></span> 新增
                                     </a>
                                 </div>
@@ -26,54 +26,48 @@
                                 <th>商品ID</th>
                                 <th>商品图片</th>
                                 <th>商品名称</th>
-                                <th>商品分类</th>
-                                <th>初始设置销量</th>
-                                <th>实际销量</th>
-                                <th>商品价格</th>
-                                <th>商品库存（KG/个）</th>
-                                <th>商品状态</th>
-                                <th>添加时间</th>
-                                <th>操作</th>
+                                <th>所需积分</th>
+                                <th>当前库存</th>
+                                <!-- <th>商品状态</th>
+                                <th>操作</th> -->
                             </tr>
                             </thead>
                             <tbody>
                             <?php if (!$list->isEmpty()): foreach ($list as $item): ?>
                                 <tr>
-                                    <td class="am-text-middle"><?= $item['goods_id'] ?></td>
+                                    <td class="am-text-middle"><?= $item['score_id'] ?></td>
                                     <td class="am-text-middle">
-                                        <a href="<?= $item['image'][0]['file_path'] ?>"
-                                           title="点击查看大图" target="_blank">
-                                            <img src="<?= $item['image'][0]['file_path'] ?>"
-                                                 width="50" height="50" alt="商品图片">
-                                        </a>
+                                        <img src="<?= $item['file_url'].$item['file_name'] ?>"
+                                             width="50" height="50" alt="商品图片">
                                     </td>
                                     <td class="am-text-middle">
-                                        <p class="item-title"><?= $item['goods_name'] ?></p>
+                                        <p class="item-title"><?= $item['name'] ?></p>
                                     </td>
-                                    <td class="am-text-middle"><?= $item['category']['name'] ?></td>
-                                    <td class="am-text-middle"><?= $item['sales_initial'] ?></td>
-                                    <td class="am-text-middle"><?= $item['sales_actual'] ?></td>
-                                    <td class="am-text-middle"><?= $item['spec'][0]['goods_price'] ?></td>
-                                    <td class="am-text-middle"><?= $item['spec'][0]['stock_num'] ?></td>
-                                    <td class="am-text-middle">
-                                            <span class="<?= $item['goods_status']['value'] == 10 ? 'x-color-green'
+                                    <td class="am-text-middle"><?= $item['score_num'] ?></td>
+                                    <td class="am-text-middle"><?= $item['stock_num'] ?></td>
+                                    <!-- <td class="am-text-middle">
+                                            <span class="<?= $item['status'] == 10 ? 'x-color-green'
                                                 : 'x-color-red' ?>">
-                                            <?= $item['goods_status']['text'] ?>
+                                            <?= $item['status'] == 10 ? '上架
+                                                ' : '下架' ?>
                                             </span>
                                     </td>
-                                    <td class="am-text-middle"><?= $item['create_time'] ?></td>
                                     <td class="am-text-middle">
                                         <div class="tpl-table-black-operation">
-                                            <a href="<?= url('goods/edit',
-                                                ['goods_id' => $item['goods_id']]) ?>">
-                                                <i class="am-icon-pencil"></i> 编辑
+                                            <a href="javascript:;" class="x-color-green"
+                                               data-id="<?= $item['score_id'] ?>">
+                                                上架
+                                            </a>
+                                            <a href="javascript:;" class="x-color-red"
+                                               data-id="<?= $item['score_id'] ?>">
+                                                下架
                                             </a>
                                             <a href="javascript:;" class="item-delete tpl-table-black-operation-del"
-                                               data-id="<?= $item['goods_id'] ?>">
+                                               data-id="<?= $item['score_id'] ?>">
                                                 <i class="am-icon-trash"></i> 删除
                                             </a>
                                         </div>
-                                    </td>
+                                    </td> -->
                                 </tr>
                             <?php endforeach; else: ?>
                                 <tr>
@@ -96,10 +90,9 @@
 </div>
 <script>
     $(function () {
-
         // 删除元素
-        var url = "<?= url('goods/delete') ?>";
-        $('.item-delete').delete('goods_id', url);
+        var url = "<?= url('shop/delete') ?>";
+        $('.item-delete').delete('score_id', url);
 
     });
 </script>

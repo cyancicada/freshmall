@@ -38,6 +38,30 @@ return [
             ]
         ],
     ],
+    'shop' => [
+        'name' => '积分商城管理',
+        'icon' => 'icon-shop',
+        'index' => 'shop/index',
+        'submenu' => [
+            [
+                'name' => '积分兑换商品',
+                'index' => 'shop/index',
+                'uris' => [
+                    'shop/index',
+                    'shop/edit'
+                ],
+            ],
+            // [
+            //     'name' => '商品分类',
+            //     'index' => 'goods.category/index',
+            //     'uris' => [
+            //         'goods.category/index',
+            //         'goods.category/add',
+            //         'goods.category/edit',
+            //     ],
+            // ]
+        ],
+    ],
     'order' => [
         'name' => '订单管理',
         'icon' => 'icon-order',
