@@ -22,7 +22,7 @@ class ShopModel extends BaseModel
     public function getScoreShopGoods() {
         return $this->alias("score")
             ->join("yoshop_upload_file file", "file.file_id = score.img")
-            ->order("score.score_num desc")
+            ->order("score.score_num asc")
             ->paginate(1, false, [
                 'query' => Request::instance()->request()
             ]);
