@@ -115,7 +115,6 @@ class Order extends OrderModel
             'total_price' => $order['order_total_price'],
             'pay_price' => $order['order_pay_price'],
             'express_price' => $order['express_price'],
-            'remark' => $order['remark'],
         ]);
         // 订单商品列表
         $goodsList = [];
