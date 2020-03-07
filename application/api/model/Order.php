@@ -22,6 +22,28 @@ class Order extends OrderModel
         'update_time'
     ];
 
+    ///6:00——7:00
+    //7:00——9:00
+    //9:00——11:00
+    //14:00——16:00
+    //16:00——18:00
+    //18:00——20:00
+    public static $timeRange = [
+        [
+            '今天',
+            '明天',
+            '后天'
+        ],
+        [
+            '06:00~07:00',
+            '07:00~09:00',
+            '09:00~11:00',
+            '14:00~16:00',
+            '16:00~18:00',
+            '18:00~20:00',
+        ]
+    ];
+
     /**
      * 订单确认-立即购买
      * @param User $user
@@ -75,6 +97,7 @@ class Order extends OrderModel
             'intra_region' => $intraRegion,    // 当前用户收货城市是否存在配送规则中
             'has_error' => $this->hasError(),
             'error_msg' => $this->getError(),
+            'time_range'=>self::$timeRange,
         ];
     }
 
@@ -91,6 +114,20 @@ class Order extends OrderModel
     {
         $model = new Cart($user['user_id']);
         return $model->getList($user);
+    }
+
+    /** 获取时间范围
+     * @param $dayIndex
+     * @param $timeIndex
+     * @return string
+     */
+    public static function captureTime($dayIndex, $timeIndex)
+    {
+        $timeRange = self::$timeRange[1][$timeIndex];
+        if (intval($dayIndex) == 0) return date('Y-m-d') . ' ' . $timeRange;
+
+        $incr = '+' . $dayIndex . ' days';
+        return date('Y-m-d', strtotime($incr)) . ' ' . $timeRange;
     }
 
     /**
@@ -329,6 +366,22 @@ class Order extends OrderModel
             }
         }
         return true;
+    }
+
+    /** 更新用户配送时间
+     * @param $order_id
+     * @param $claim_delivery_time
+     * @return Order
+     */
+    public static function updateClaimDeliveryTime($order_id, $claim_delivery_time)
+    {
+        $claimDeliveryTime = null;
+        if (!empty($claim_delivery_time)) {
+            list($dayIndex, $timeIndex) = explode(',', $claim_delivery_time);
+            $claimDeliveryTime = self::captureTime($dayIndex, $timeIndex);
+        };
+
+        return self::update(['claim_delivery_time' => $claimDeliveryTime], ['order_id' => $order_id]);
     }
 
     /**
