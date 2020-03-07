@@ -84,7 +84,7 @@ class Order extends Controller
             return $this->renderSuccess($order);
         }
         if (!isset($order['delivery_time'])) $order['delivery_time'] = $delivery_time;
-        $order["remark"] = $this->request->post("remark");
+        $order["remark"] = $this->request->get("remark");
         // 创建订单
         if ($model->add($this->user['user_id'], $order)) {
             // 清空购物车
