@@ -48,7 +48,7 @@ class Order extends Controller
         if (!$this->request->isPost()) {
             return $this->renderSuccess($order);
         }
-        dd(Request::instance()->get());
+        dd($this->request->get());
         if ($model->hasError()) {
             return $this->renderError($model->getError());
         }
