@@ -51,6 +51,7 @@ class Order extends Controller
         if ($model->hasError()) {
             return $this->renderError($model->getError());
         }
+        $order['remark'] = $this->request->post('remark');
         if (!isset($order['delivery_time'])) $order['delivery_time'] = $delivery_time;
         // 创建订单
         if ($model->add($this->user['user_id'], $order)) {
