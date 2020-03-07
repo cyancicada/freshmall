@@ -345,7 +345,10 @@ class Order extends OrderModel
      */
     public static function updateClaimDeliveryTime($order_id, $claim_delivery_time)
     {
-        return self::update(['claim_delivery_time' => $claim_delivery_time], ['order_id' => $order_id]);
+        $claimDeliveryTime = null;
+        if (!empty($claim_delivery_time)) $claimDeliveryTime = date('Y-m-d') . ' ' . $claim_delivery_time;
+
+        return self::update(['claim_delivery_time' => $claimDeliveryTime], ['order_id' => $order_id]);
     }
 
     /**
