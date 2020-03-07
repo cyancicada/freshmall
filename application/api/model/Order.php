@@ -22,6 +22,28 @@ class Order extends OrderModel
         'update_time'
     ];
 
+    protected static $timeRange = [
+        [
+            '今天',
+            '明天',
+            '后天'
+        ],
+        [
+            '09:00~10:00',
+            '10:00~11:00',
+            '11:00~12:00',
+            '12:00~13:00',
+            '13:00~14:00',
+            '14:00~15:00',
+            '15:00~16:00',
+            '16:00~17:00',
+            '17:00~18:00',
+            '18:00~19:00',
+            '19:00~20:00',
+            '20:00~21:00'
+        ]
+    ];
+
     /**
      * 订单确认-立即购买
      * @param User $user
@@ -93,6 +115,20 @@ class Order extends OrderModel
         return $model->getList($user);
     }
 
+    /** 获取时间范围
+     * @param $dayIndex
+     * @param $timeIndex
+     * @return string
+     */
+    public static function captureTime($dayIndex, $timeIndex)
+    {
+        $timeRange = self::$timeRange[1][$timeIndex];
+        if (intval($dayIndex) == 0) return date('Y-m-d') . ' ' . $timeRange;
+
+        $incr = '+' . $dayIndex . ' days';
+        return date('Y-m-d', strtotime($incr)) . ' ' . $timeRange;
+    }
+
     /**
      * 新增订单
      * @param $user_id
@@ -115,6 +151,7 @@ class Order extends OrderModel
             'total_price' => $order['order_total_price'],
             'pay_price' => $order['order_pay_price'],
             'express_price' => $order['express_price'],
+            'remark' => $order['remark'],
         ]);
         // 订单商品列表
         $goodsList = [];
@@ -328,6 +365,22 @@ class Order extends OrderModel
             }
         }
         return true;
+    }
+
+    /** 更新用户配送时间
+     * @param $order_id
+     * @param $claim_delivery_time
+     * @return Order
+     */
+    public static function updateClaimDeliveryTime($order_id, $claim_delivery_time)
+    {
+        $claimDeliveryTime = null;
+        if (!empty($claim_delivery_time)) {
+            list($dayIndex, $timeIndex) = explode(',', $claim_delivery_time);
+            $claimDeliveryTime = self::captureTime($dayIndex, $timeIndex);
+        };
+
+        return self::update(['claim_delivery_time' => $claimDeliveryTime], ['order_id' => $order_id]);
     }
 
     /**
