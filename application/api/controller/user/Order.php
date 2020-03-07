@@ -96,7 +96,7 @@ class Order extends Controller
      * @throws \app\common\exception\BaseException
      * @throws \think\exception\DbException
      */
-    public function pay($order_id)
+    public function pay($order_id,$delivery_time = null)
     {
         // 订单详情
         $order = OrderModel::getUserOrderDetail($order_id, $this->user['user_id']);
@@ -104,6 +104,7 @@ class Order extends Controller
         if (!$order->checkGoodsStatusFromOrder($order['goods'])) {
             return $this->renderError($order->getError());
         }
+        $this->deliveryTime($order_id,$delivery_time);
         // 发起微信支付
         $wxConfig = WxappModel::getWxappCache();
         $WxPay = new WxPay($wxConfig);
