@@ -22,7 +22,7 @@ class Order extends OrderModel
         'update_time'
     ];
 
-    protected static $timeRange = [
+    public static $timeRange = [
         [
             '今天',
             '明天',
@@ -100,6 +100,7 @@ class Order extends OrderModel
             'intra_region' => $intraRegion,    // 当前用户收货城市是否存在配送规则中
             'has_error' => $this->hasError(),
             'error_msg' => $this->getError(),
+            'time_range'=>self::$timeRange,
         ];
     }
 
