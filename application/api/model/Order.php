@@ -22,28 +22,6 @@ class Order extends OrderModel
         'update_time'
     ];
 
-    protected static $timeRange = [
-        [
-            '今天',
-            '明天',
-            '后天'
-        ],
-        [
-            '09:00~10:00',
-            '10:00~11:00',
-            '11:00~12:00',
-            '12:00~13:00',
-            '13:00~14:00',
-            '14:00~15:00',
-            '15:00~16:00',
-            '16:00~17:00',
-            '17:00~18:00',
-            '18:00~19:00',
-            '19:00~20:00',
-            '20:00~21:00'
-        ]
-    ];
-
     /**
      * 订单确认-立即购买
      * @param User $user
@@ -71,7 +49,7 @@ class Order extends OrderModel
         // 商品单价
         $goods['goods_price'] = $goods['goods_sku']['goods_price'];
         // 商品总价
-        $goods['total_num']   = $goods_num;
+        $goods['total_num'] = $goods_num;
         $goods['total_price'] = $totalPrice = bcmul($goods['goods_price'], $goods_num, 2);
         // 商品总重量
         $goods_total_weight = bcmul($goods['goods_sku']['goods_weight'], $goods_num, 2);
@@ -87,16 +65,16 @@ class Order extends OrderModel
         $expressPrice = $intraRegion ?
             $goods['delivery']->calcTotalFee($goods_num, $goods_total_weight, $cityId) : 0;
         return [
-            'goods_list'        => [$goods],               // 商品详情
-            'order_total_num'   => $goods_num,        // 商品总数量
+            'goods_list' => [$goods],               // 商品详情
+            'order_total_num' => $goods_num,        // 商品总数量
             'order_total_price' => $totalPrice,    // 商品总金额 (不含运费)
-            'order_pay_price'   => bcadd($totalPrice, $expressPrice, 2),  // 实际支付金额
-            'address'           => $user['address_default'],  // 默认地址
-            'exist_address'     => $exist_address,  // 是否存在收货地址
-            'express_price'     => $expressPrice,    // 配送费用
-            'intra_region'      => $intraRegion,    // 当前用户收货城市是否存在配送规则中
-            'has_error'         => $this->hasError(),
-            'error_msg'         => $this->getError(),
+            'order_pay_price' => bcadd($totalPrice, $expressPrice, 2),  // 实际支付金额
+            'address' => $user['address_default'],  // 默认地址
+            'exist_address' => $exist_address,  // 是否存在收货地址
+            'express_price' => $expressPrice,    // 配送费用
+            'intra_region' => $intraRegion,    // 当前用户收货城市是否存在配送规则中
+            'has_error' => $this->hasError(),
+            'error_msg' => $this->getError(),
         ];
     }
 
@@ -115,20 +93,6 @@ class Order extends OrderModel
         return $model->getList($user);
     }
 
-    /** 获取时间范围
-     * @param $dayIndex
-     * @param $timeIndex
-     * @return string
-     */
-    public static function captureTime($dayIndex, $timeIndex)
-    {
-        $timeRange = self::$timeRange[1][$timeIndex];
-        if (intval($dayIndex) == 0) return date('Y-m-d') . ' ' . $timeRange;
-
-        $incr = '+' . $dayIndex . ' days';
-        return date('Y-m-d', strtotime($incr)) . ' ' . $timeRange;
-    }
-
     /**
      * 新增订单
      * @param $user_id
@@ -143,20 +107,15 @@ class Order extends OrderModel
             return false;
         }
         Db::startTrans();
-        $claimDeliveryTime = null;
-        if (isset($order['delivery_time']) && !empty($order['delivery_time'])) {
-            list($dayIndex, $timeIndex) = explode(',', $order['delivery_time']);
-            $claimDeliveryTime = self::captureTime($dayIndex, $timeIndex);
-        }
         // 记录订单信息
         $this->save([
-            'user_id'             => $user_id,
-            'wxapp_id'            => self::$wxapp_id,
-            'order_no'            => $this->orderNo(),
-            'claim_delivery_time' => $claimDeliveryTime,
-            'total_price'         => $order['order_total_price'],
-            'pay_price'           => $order['order_pay_price'],
-            'express_price'       => $order['express_price'],
+            'user_id' => $user_id,
+            'wxapp_id' => self::$wxapp_id,
+            'order_no' => $this->orderNo(),
+            'total_price' => $order['order_total_price'],
+            'pay_price' => $order['order_pay_price'],
+            'express_price' => $order['express_price'],
+            'remark' => $order['remark'],
         ]);
         // 订单商品列表
         $goodsList = [];
@@ -165,28 +124,28 @@ class Order extends OrderModel
         foreach ($order['goods_list'] as $goods) {
             /* @var Goods $goods */
             $goodsList[] = [
-                'user_id'           => $user_id,
-                'wxapp_id'          => self::$wxapp_id,
-                'goods_id'          => $goods['goods_id'],
-                'goods_name'        => $goods['goods_name'],
-                'image_id'          => $goods['image'][0]['image_id'],
+                'user_id' => $user_id,
+                'wxapp_id' => self::$wxapp_id,
+                'goods_id' => $goods['goods_id'],
+                'goods_name' => $goods['goods_name'],
+                'image_id' => $goods['image'][0]['image_id'],
                 'deduct_stock_type' => $goods['deduct_stock_type'],
-                'spec_type'         => $goods['spec_type'],
-                'spec_sku_id'       => $goods['goods_sku']['spec_sku_id'],
-                'goods_spec_id'     => $goods['goods_sku']['goods_spec_id'],
-                'goods_attr'        => $goods['goods_sku']['goods_attr'],
-                'content'           => $goods['content'],
-                'goods_no'          => $goods['goods_sku']['goods_no'],
-                'goods_price'       => $goods['goods_sku']['goods_price'],
-                'line_price'        => $goods['goods_sku']['line_price'],
-                'goods_weight'      => $goods['goods_sku']['goods_weight'],
-                'total_num'         => $goods['total_num'],
-                'total_price'       => $goods['total_price'],
+                'spec_type' => $goods['spec_type'],
+                'spec_sku_id' => $goods['goods_sku']['spec_sku_id'],
+                'goods_spec_id' => $goods['goods_sku']['goods_spec_id'],
+                'goods_attr' => $goods['goods_sku']['goods_attr'],
+                'content' => $goods['content'],
+                'goods_no' => $goods['goods_sku']['goods_no'],
+                'goods_price' => $goods['goods_sku']['goods_price'],
+                'line_price' => $goods['goods_sku']['line_price'],
+                'goods_weight' => $goods['goods_sku']['goods_weight'],
+                'total_num' => $goods['total_num'],
+                'total_price' => $goods['total_price'],
             ];
             // 下单减库存
             $goods['deduct_stock_type'] == 10 && $deductStockData[] = [
                 'goods_spec_id' => $goods['goods_sku']['goods_spec_id'],
-                'stock_num'     => ['dec', $goods['total_num']]
+                'stock_num' => ['dec', $goods['total_num']]
             ];
         }
         // 保存订单商品信息
@@ -195,14 +154,14 @@ class Order extends OrderModel
         !empty($deductStockData) && (new GoodsSpec)->isUpdate()->saveAll($deductStockData);
         // 记录收货地址
         $this->address()->save([
-            'user_id'     => $user_id,
-            'wxapp_id'    => self::$wxapp_id,
-            'name'        => $order['address']['name'],
-            'phone'       => $order['address']['phone'],
+            'user_id' => $user_id,
+            'wxapp_id' => self::$wxapp_id,
+            'name' => $order['address']['name'],
+            'phone' => $order['address']['phone'],
             'province_id' => $order['address']['province_id'],
-            'city_id'     => $order['address']['city_id'],
-            'region_id'   => $order['address']['region_id'],
-            'detail'      => $order['address']['detail'],
+            'city_id' => $order['address']['city_id'],
+            'region_id' => $order['address']['region_id'],
+            'detail' => $order['address']['detail'],
         ]);
         Db::commit();
         return true;
@@ -229,13 +188,13 @@ class Order extends OrderModel
                 $filter['pay_status'] = 10;
                 break;
             case 'delivery';
-                $filter['pay_status']      = 20;
+                $filter['pay_status'] = 20;
                 $filter['delivery_status'] = 10;
                 break;
             case 'received';
-                $filter['pay_status']      = 20;
+                $filter['pay_status'] = 20;
                 $filter['delivery_status'] = 20;
-                $filter['receipt_status']  = 10;
+                $filter['receipt_status'] = 10;
                 break;
         }
         return $this->with(['goods.image'])
@@ -276,7 +235,7 @@ class Order extends OrderModel
             if ($goods['deduct_stock_type'] == 10) {
                 $goodsSpecSave[] = [
                     'goods_spec_id' => $goods['goods_spec_id'],
-                    'stock_num'     => ['inc', $goods['total_num']]
+                    'stock_num' => ['inc', $goods['total_num']]
                 ];
             }
         }
@@ -296,8 +255,8 @@ class Order extends OrderModel
         }
         return $this->save([
             'receipt_status' => 20,
-            'receipt_time'   => time(),
-            'order_status'   => 30
+            'receipt_time' => time(),
+            'order_status' => 30
         ]);
     }
 
@@ -319,9 +278,9 @@ class Order extends OrderModel
                 $filter['pay_status'] = 10;
                 break;
             case 'received';
-                $filter['pay_status']      = 20;
+                $filter['pay_status'] = 20;
                 $filter['delivery_status'] = 20;
-                $filter['receipt_status']  = 10;
+                $filter['receipt_status'] = 10;
                 break;
         }
         return $this->where('user_id', '=', $user_id)
@@ -341,8 +300,8 @@ class Order extends OrderModel
     public static function getUserOrderDetail($order_id, $user_id)
     {
         if (!$order = self::get([
-            'order_id'     => $order_id,
-            'user_id'      => $user_id,
+            'order_id' => $order_id,
+            'user_id' => $user_id,
             'order_status' => ['<>', 20]
         ], ['goods' => ['image', 'spec', 'goods'], 'address'])) {
             throw new BaseException(['msg' => '订单不存在']);
@@ -370,22 +329,6 @@ class Order extends OrderModel
             }
         }
         return true;
-    }
-
-    /** 更新用户配送时间
-     * @param $order_id
-     * @param $claim_delivery_time
-     * @return Order
-     */
-    public static function updateClaimDeliveryTime($order_id, $claim_delivery_time)
-    {
-        $claimDeliveryTime = null;
-        if (!empty($claim_delivery_time)) {
-            list($dayIndex, $timeIndex) = explode(',', $claim_delivery_time);
-            $claimDeliveryTime = self::captureTime($dayIndex, $timeIndex);
-        };
-
-        return self::update(['claim_delivery_time' => $claimDeliveryTime], ['order_id' => $order_id]);
     }
 
     /**
