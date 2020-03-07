@@ -38,17 +38,19 @@ class Order extends Controller
      * @throws \think\exception\DbException
      * @throws \Exception
      */
-    public function buyNow($goods_id, $goods_num, $goods_sku_id)
+    public function buyNow($goods_id, $goods_num, $goods_sku_id,$delivery_time)
     {
         // 商品结算信息
         $model = new OrderModel;
         $order = $model->getBuyNow($this->user, $goods_id, $goods_num, $goods_sku_id);
+
         if (!$this->request->isPost()) {
             return $this->renderSuccess($order);
         }
         if ($model->hasError()) {
             return $this->renderError($model->getError());
         }
+        if (!isset($order['delivery_time'])) $order['delivery_time'] = $delivery_time;
         // 创建订单
         if ($model->add($this->user['user_id'], $order)) {
             // 发起微信支付
