@@ -107,13 +107,16 @@ class Order extends OrderModel
             return false;
         }
         Db::startTrans();
-        $today = date('Y-m-d');
+        $claimDeliveryTime = null;
+        if (isset($order['delivery_time']) && !empty($order['delivery_time'])){
+            $claimDeliveryTime = date('Y-m-d').' '.$order['delivery_time'];
+        }
         // 记录订单信息
         $this->save([
             'user_id'             => $user_id,
             'wxapp_id'            => self::$wxapp_id,
             'order_no'            => $this->orderNo(),
-            'claim_delivery_time' => isset($order['delivery_time']) ? ($today . ' ' . $order['delivery_time']) : null,
+            'claim_delivery_time' => $claimDeliveryTime,
             'total_price'         => $order['order_total_price'],
             'pay_price'           => $order['order_pay_price'],
             'express_price'       => $order['express_price'],

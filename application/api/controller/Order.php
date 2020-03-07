@@ -38,7 +38,7 @@ class Order extends Controller
      * @throws \think\exception\DbException
      * @throws \Exception
      */
-    public function buyNow($goods_id, $goods_num, $goods_sku_id,$delivery_time)
+    public function buyNow($goods_id, $goods_num, $goods_sku_id,$delivery_time=null)
     {
         // 商品结算信息
         $model = new OrderModel;
