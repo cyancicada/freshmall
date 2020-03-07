@@ -108,8 +108,8 @@ class Order extends OrderModel
         }
         Db::startTrans();
         $claimDeliveryTime = null;
-        if (isset($order['delivery_time']) && !empty($order['delivery_time'])){
-            $claimDeliveryTime = date('Y-m-d').' '.$order['delivery_time'];
+        if (isset($order['delivery_time']) && !empty($order['delivery_time'])) {
+            $claimDeliveryTime = date('Y-m-d') . ' ' . $order['delivery_time'];
         }
         // 记录订单信息
         $this->save([
@@ -311,7 +311,7 @@ class Order extends OrderModel
             throw new BaseException(['msg' => '订单不存在']);
         }
         $order['claim_delivery_time'] = !empty($order['claim_delivery_time']) ?
-            date('H:i',strtotime($order['claim_delivery_time'])) : '';
+            date('H:i', strtotime($order['claim_delivery_time'])) : '';
 
         return $order;
     }
@@ -336,6 +336,16 @@ class Order extends OrderModel
             }
         }
         return true;
+    }
+
+    /** 更新用户配送时间
+     * @param $order_id
+     * @param $claim_delivery_time
+     * @return Order
+     */
+    public static function updateClaimDeliveryTime($order_id, $claim_delivery_time)
+    {
+        return self::update(['claim_delivery_time' => $claim_delivery_time], ['order_id' => $order_id]);
     }
 
     /**

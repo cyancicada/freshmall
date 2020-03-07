@@ -111,4 +111,19 @@ class Order extends Controller
         return $this->renderSuccess($wxParams);
     }
 
+    /** 更新用户配送时间
+     * @param $order_id
+     * @param null $claim_delivery_time
+     * @return array
+     * @throws \think\exception\DbException
+     */
+    public function deliveryTime($order_id,$claim_delivery_time=null){
+        $order = OrderModel::detail($order_id);
+        if (empty($order)) return $this->renderError($order->getError());
+
+        $order = OrderModel::updateClaimDeliveryTime($order_id,$claim_delivery_time);
+        if ($order->hasError()) return $this->renderError($order->getError());
+
+        return $this->renderSuccess();
+    }
 }
