@@ -48,7 +48,6 @@ class Order extends Controller
         if (!$this->request->isPost()) {
             return $this->renderSuccess($order);
         }
-        dd($this->request->post());
         if ($model->hasError()) {
             return $this->renderError($model->getError());
         }
