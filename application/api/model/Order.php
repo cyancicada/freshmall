@@ -310,7 +310,9 @@ class Order extends OrderModel
         ], ['goods' => ['image', 'spec', 'goods'], 'address'])) {
             throw new BaseException(['msg' => '订单不存在']);
         }
-        //foreach ($order as &$item) $item['claim_delivery_time'] = date('H:i',strtotime($item['claim_delivery_time']));
+        $order['claim_delivery_time'] = !empty($order['claim_delivery_time']) ?
+            date('H:i',strtotime($order['claim_delivery_time'])) : '';
+
         return $order;
     }
 
