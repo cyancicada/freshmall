@@ -144,6 +144,12 @@ class Order extends OrderModel
             return false;
         }
         Db::startTrans();
+
+        $claimDeliveryTime = null;
+        if (isset($order['delivery_time']) && !empty($order['delivery_time'])) {
+            list($dayIndex, $timeIndex) = explode(',', $order['delivery_time']);
+            $claimDeliveryTime = self::captureTime($dayIndex, $timeIndex);
+        }
         // 记录订单信息
         $this->save([
             'user_id' => $user_id,
@@ -152,6 +158,7 @@ class Order extends OrderModel
             'total_price' => $order['order_total_price'],
             'pay_price' => $order['order_pay_price'],
             'express_price' => $order['express_price'],
+            'claim_delivery_time' => $claimDeliveryTime,
             'remark'    => $order['remark'],
         ]);
         // 订单商品列表
