@@ -119,15 +119,16 @@ class Order extends OrderModel
     /** 获取时间范围
      * @param $dayIndex
      * @param $timeIndex
-     * @return string
+     * @return array
      */
-    public static function captureTime($dayIndex, $timeIndex)
+    public static function captureTime($deliveryTimeArray)
     {
+        list($dayIndex, $timeIndex) = explode(',', $deliveryTimeArray);
         $timeRange = self::$timeRange[1][$timeIndex];
-        if (intval($dayIndex) == 0) return date('Y-m-d') . ' ' . $timeRange;
+        if (intval($dayIndex) == 0) return [date('Y-m-d'), $timeRange];
 
         $incr = '+' . $dayIndex . ' days';
-        return date('Y-m-d', strtotime($incr)) . ' ' . $timeRange;
+        return [date('Y-m-d', strtotime($incr)), $timeRange];
     }
 
     /**
@@ -145,10 +146,10 @@ class Order extends OrderModel
         }
         Db::startTrans();
 
-        $claimDeliveryTime = null;
+        $day = '';
+        $timeRange = '';
         if (isset($order['delivery_time']) && !empty($order['delivery_time'])) {
-            list($dayIndex, $timeIndex) = explode(',', $order['delivery_time']);
-            $claimDeliveryTime = self::captureTime($dayIndex, $timeIndex);
+            list($day, $timeRange) = self::captureTime($order['delivery_time']);
         }
         // 记录订单信息
         $this->save([
@@ -158,7 +159,8 @@ class Order extends OrderModel
             'total_price' => $order['order_total_price'],
             'pay_price' => $order['order_pay_price'],
             'express_price' => $order['express_price'],
-            'claim_delivery_time' => $claimDeliveryTime,
+            'claim_delivery_time' => $day,
+            'claim_time_range' => $timeRange,
             'remark'    => $order['remark'],
         ]);
         // 订单商品列表
@@ -382,13 +384,13 @@ class Order extends OrderModel
      */
     public static function updateClaimDeliveryTime($order_id, $claim_delivery_time)
     {
-        $claimDeliveryTime = null;
+        $day = '';
+        $timeRange = '';
         if (!empty($claim_delivery_time)) {
-            list($dayIndex, $timeIndex) = explode(',', $claim_delivery_time);
-            $claimDeliveryTime = self::captureTime($dayIndex, $timeIndex);
-        };
+            list($day, $timeRange) = self::captureTime($claim_delivery_time);
+        }
 
-        return self::update(['claim_delivery_time' => $claimDeliveryTime], ['order_id' => $order_id]);
+        return self::update(['claim_delivery_time' => $day,'claim_time_range'=>$timeRange], ['order_id' => $order_id]);
     }
 
     /**
