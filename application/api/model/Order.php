@@ -22,6 +22,28 @@ class Order extends OrderModel
         'update_time'
     ];
 
+    ///6:00——7:00
+    //7:00——9:00
+    //9:00——11:00
+    //14:00——16:00
+    //16:00——18:00
+    //18:00——20:00
+    public static $timeRange = [
+        [
+            '今天',
+            '明天',
+            '后天'
+        ],
+        [
+            '06:00~07:00',
+            '07:00~09:00',
+            '09:00~11:00',
+            '14:00~16:00',
+            '16:00~18:00',
+            '18:00~20:00',
+        ]
+    ];
+
     /**
      * 订单确认-立即购买
      * @param User $user
@@ -75,6 +97,7 @@ class Order extends OrderModel
             'intra_region' => $intraRegion,    // 当前用户收货城市是否存在配送规则中
             'has_error' => $this->hasError(),
             'error_msg' => $this->getError(),
+            'time_range'=>self::$timeRange,
         ];
     }
 
@@ -93,6 +116,21 @@ class Order extends OrderModel
         return $model->getList($user);
     }
 
+    /** 获取时间范围
+     * @param $dayIndex
+     * @param $timeIndex
+     * @return array
+     */
+    public static function captureTime($deliveryTimeArray)
+    {
+        list($dayIndex, $timeIndex) = explode(',', $deliveryTimeArray);
+        $timeRange = self::$timeRange[1][$timeIndex];
+        if (intval($dayIndex) == 0) return [date('Y-m-d'), $timeRange];
+
+        $incr = '+' . $dayIndex . ' days';
+        return [date('Y-m-d', strtotime($incr)), $timeRange];
+    }
+
     /**
      * 新增订单
      * @param $user_id
@@ -107,6 +145,12 @@ class Order extends OrderModel
             return false;
         }
         Db::startTrans();
+
+        $day = '';
+        $timeRange = '';
+        if (isset($order['delivery_time']) && !empty($order['delivery_time'])) {
+            list($day, $timeRange) = self::captureTime($order['delivery_time']);
+        }
         // 记录订单信息
         $this->save([
             'user_id' => $user_id,
@@ -115,6 +159,9 @@ class Order extends OrderModel
             'total_price' => $order['order_total_price'],
             'pay_price' => $order['order_pay_price'],
             'express_price' => $order['express_price'],
+            'claim_delivery_time' => $day,
+            'claim_time_range' => $timeRange,
+            'remark'    => $order['remark'],
         ]);
         // 订单商品列表
         $goodsList = [];
@@ -328,6 +375,22 @@ class Order extends OrderModel
             }
         }
         return true;
+    }
+
+    /** 更新用户配送时间
+     * @param $order_id
+     * @param $claim_delivery_time
+     * @return Order
+     */
+    public static function updateClaimDeliveryTime($order_id, $claim_delivery_time)
+    {
+        $day = '';
+        $timeRange = '';
+        if (!empty($claim_delivery_time)) {
+            list($day, $timeRange) = self::captureTime($claim_delivery_time);
+        }
+
+        return self::update(['claim_delivery_time' => $day,'claim_time_range'=>$timeRange], ['order_id' => $order_id]);
     }
 
     /**

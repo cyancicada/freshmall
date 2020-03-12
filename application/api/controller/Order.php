@@ -6,6 +6,7 @@ use app\api\model\Order as OrderModel;
 use app\api\model\Wxapp as WxappModel;
 use app\api\model\Cart as CartModel;
 use app\common\library\wechat\WxPay;
+use think\Request;
 
 /**
  * 订单控制器
@@ -38,22 +39,25 @@ class Order extends Controller
      * @throws \think\exception\DbException
      * @throws \Exception
      */
-    public function buyNow($goods_id, $goods_num, $goods_sku_id)
+    public function buyNow($goods_id, $goods_num, $goods_sku_id, $delivery_time = null)
     {
         // 商品结算信息
         $model = new OrderModel;
         $order = $model->getBuyNow($this->user, $goods_id, $goods_num, $goods_sku_id);
+
         if (!$this->request->isPost()) {
             return $this->renderSuccess($order);
         }
         if ($model->hasError()) {
             return $this->renderError($model->getError());
         }
+        $order['remark'] = $this->request->post('remark');
+        if (!isset($order['delivery_time'])) $order['delivery_time'] = $delivery_time;
         // 创建订单
         if ($model->add($this->user['user_id'], $order)) {
             // 发起微信支付
             return $this->renderSuccess([
-                'payment' => $this->wxPay($model['order_no'], $this->user['open_id']
+                'payment'  => $this->wxPay($model['order_no'], $this->user['open_id']
                     , $order['order_pay_price']),
                 'order_id' => $model['order_id']
             ]);
@@ -72,7 +76,7 @@ class Order extends Controller
      * @throws \think\exception\DbException
      * @throws \Exception
      */
-    public function cart()
+    public function cart($delivery_time = null)
     {
         // 商品结算信息
         $model = new OrderModel;
@@ -80,6 +84,8 @@ class Order extends Controller
         if (!$this->request->isPost()) {
             return $this->renderSuccess($order);
         }
+        if (!isset($order['delivery_time'])) $order['delivery_time'] = $delivery_time;
+        $order["remark"] = $this->request->post("remark");
         // 创建订单
         if ($model->add($this->user['user_id'], $order)) {
             // 清空购物车
@@ -87,7 +93,7 @@ class Order extends Controller
             $Card->clearAll();
             // 发起微信支付
             return $this->renderSuccess([
-                'payment' => $this->wxPay($model['order_no'], $this->user['open_id']
+                'payment'  => $this->wxPay($model['order_no'], $this->user['open_id']
                     , $order['order_pay_price']),
                 'order_id' => $model['order_id']
             ]);
@@ -108,7 +114,7 @@ class Order extends Controller
     private function wxPay($order_no, $open_id, $pay_price)
     {
         $wxConfig = WxappModel::getWxappCache();
-        $WxPay = new WxPay($wxConfig);
+        $WxPay    = new WxPay($wxConfig);
         return $WxPay->unifiedorder($order_no, $open_id, $pay_price);
     }
 

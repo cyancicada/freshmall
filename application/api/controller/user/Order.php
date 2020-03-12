@@ -53,7 +53,7 @@ class Order extends Controller
     public function detail($order_id)
     {
         $order = OrderModel::getUserOrderDetail($order_id, $this->user['user_id']);
-        return $this->renderSuccess(['order' => $order]);
+        return $this->renderSuccess(['order' => $order,'time_range'=>OrderModel::$timeRange]);
     }
 
     /**
@@ -96,7 +96,7 @@ class Order extends Controller
      * @throws \app\common\exception\BaseException
      * @throws \think\exception\DbException
      */
-    public function pay($order_id)
+    public function pay($order_id,$delivery_time = null)
     {
         // 订单详情
         $order = OrderModel::getUserOrderDetail($order_id, $this->user['user_id']);
@@ -104,6 +104,7 @@ class Order extends Controller
         if (!$order->checkGoodsStatusFromOrder($order['goods'])) {
             return $this->renderError($order->getError());
         }
+        $this->deliveryTime($order_id,$delivery_time);
         // 发起微信支付
         $wxConfig = WxappModel::getWxappCache();
         $WxPay = new WxPay($wxConfig);
@@ -111,4 +112,19 @@ class Order extends Controller
         return $this->renderSuccess($wxParams);
     }
 
+    /** 更新用户配送时间
+     * @param $order_id
+     * @param null $claim_delivery_time
+     * @return array
+     * @throws \think\exception\DbException
+     */
+    public function deliveryTime($order_id,$claim_delivery_time=null){
+        $order = OrderModel::detail($order_id);
+        if (empty($order)) return $this->renderError($order->getError());
+
+        $order = OrderModel::updateClaimDeliveryTime($order_id,$claim_delivery_time);
+        if ($order->hasError()) return $this->renderError($order->getError());
+
+        return $this->renderSuccess();
+    }
 }

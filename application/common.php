@@ -184,3 +184,17 @@ function getGuidV4($trim = true)
         $rbrace;
     return $guidv4;
 }
+
+
+if (!function_exists('dd')){
+
+
+    function dd($val = ''){
+
+        echo '<pre>';
+
+        print_r($val);
+
+        die('</pre>');
+    }
+}

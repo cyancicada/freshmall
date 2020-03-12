@@ -25,5 +25,4 @@ class User extends Controller
         $token = $model->getToken();
         return $this->renderSuccess(compact('user_id', 'token'));
     }
-
 }
