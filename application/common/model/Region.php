@@ -39,6 +39,18 @@ class Region extends BaseModel
             ->value('id') ?: static::add($name, $level, $pid);
     }
 
+
+    /**
+     * 根据名称获取地区
+     * @param int $level
+     * @param int $pid
+     * @return mixed
+     */
+    public static function getIdByPId($pid = 0)
+    {
+        return static::useGlobalScope(false)->where(compact('pid'))->select();
+    }
+
     /**
      * @param $name
      * @param int $level

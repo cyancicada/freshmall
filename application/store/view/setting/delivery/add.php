@@ -39,7 +39,7 @@
                                          am-table-centered am-margin-bottom-xs">
                                             <tbody>
                                             <tr>
-                                                <th width="42%">可配送区域</th>
+                                                <th width="50%">可配送区域</th>
                                                 <th>
                                                     <span class="first">首件 (个)</span>
                                                 </th>
@@ -50,12 +50,31 @@
                                                 <th>续费 (元)</th>
                                             </tr>
                                             <tr>
-                                                <td colspan="5" class="am-text-left">
-                                                    <a class="add-region am-btn am-btn-default am-btn-xs"
-                                                       href="javascript:;">
-                                                        <i class="iconfont icon-dingwei"></i>
-                                                        点击添加可配送区域和运费
-                                                    </a>
+                                                <td class="am-text-left am-form-inline">
+                                                    <div class="am-form-group">
+                                                        <label class="am-checkbox-inline" style="padding:0">
+                                                            <select id="province_name" name="delivery[rule][region][0]" onchange="findCity(this,0)" >
+                                                                <option value="">--请选择--</option>
+                                                                <?php foreach ($provinceList as $p):?>
+                                                                    <option value="<?= $p['id'] ?>"><?= $p['name'] ?></option>
+                                                                <?php endforeach;?>
+                                                            </select>
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                                <td >
+                                                    <label><input type="number" name="delivery[rule][first][]" value="1" required="" class="am-field-valid">
+                                                    </label>
+                                                </td><td>
+                                                    <label>
+                                                    <input type="number" name="delivery[rule][first_fee][]" value="0.00" required="" class="am-field-valid">
+                                                    </label>
+                                                </td><td>
+                                                    <label><input type="number" name="delivery[rule][additional][]" value="0" class="am-field-valid"></label>
+                                                </td><td>
+                                                    <label>
+                                                    <input type="number" name="delivery[rule][additional_fee][]" value="0.00" class="am-field-valid">
+                                                    </label>
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -89,15 +108,6 @@
 <script>
     $(function () {
 
-        // 初始化区域选择界面
-        var datas = JSON.parse('<?= $regionData ?>');
-
-        // 配送区域表格
-        new Delivery({
-            table: '.regional-table',
-            regional: '.regional-choice',
-            datas: datas
-        });
 
         /**
          * 表单验证提交
@@ -106,4 +116,22 @@
         $('#my-form').superForm();
 
     });
+    var url='<?= url() ?>';
+
+    function findCity(obj,key) {
+      var pid = $(obj).val();
+      var select = '<label class="am-checkbox-inline" style="padding:0">' +
+        '<select name=delivery[rule][region]['+pid+'] onchange=findCity(this,'+pid+')><option value="">全部</option>';
+      $.post(url,{pid:pid},function (res) {
+        if (res.data.length === 0) return;
+        for (var i=0;i<res.data.length;i++){
+          select += '<option value="'+res.data[i].id+'">'+res.data[i].name+'</option>'
+        }
+        select += '<select></label>';
+        $(obj).nextAll().each(function () {
+          $(this).remove()
+        })
+        $(select).insertAfter($(obj).parent())
+      })
+    }
 </script>

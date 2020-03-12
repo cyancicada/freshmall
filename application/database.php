@@ -3,7 +3,7 @@
 
 // 数据库配置
 $config = [
-    'host' => '127.0.0.1',
+    'host' => '47.110.45.127',
     'database' => 'fresh',
     'username' => 'root',
     'password' => 'Qwer1234',

@@ -53,8 +53,13 @@ class Delivery extends Controller
     {
         if (!$this->request->isAjax()) {
             // 获取所有地区
-            $regionData = json_encode(Region::getCacheTree());
-            return $this->fetch('add', compact('regionData'));
+            $regionData = [];
+            $provinceList = Region::getIdByPId();
+            return $this->fetch('add', compact('regionData','provinceList'));
+        }
+        if ($this->request->post('pid')){
+            $pid = $this->request->post('pid');
+            return $this->renderSuccess('添加成功',null, Region::getIdByPId($pid));
         }
         // 新增记录
         $model = new DeliveryModel;
