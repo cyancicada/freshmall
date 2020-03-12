@@ -68,4 +68,5 @@ class Delivery extends BaseModel
         return self::get($delivery_id, ['rule']);
     }
 
+
 }

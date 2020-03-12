@@ -48,12 +48,13 @@
                                                     <span class="additional">续件 (个)</span>
                                                 </th>
                                                 <th>续费 (元)</th>
+                                                <th>操作</th>
                                             </tr>
-                                            <tr>
+                                            <tr id="regional_choice_tpl" class="delivery_tr">
                                                 <td class="am-text-left am-form-inline">
                                                     <div class="am-form-group">
                                                         <label class="am-checkbox-inline" style="padding:0">
-                                                            <select id="province_name" name="delivery[rule][region][0]" onchange="findCity(this,0)" >
+                                                            <select name="delivery[rule][region][0][]" onchange="findCity(this)" >
                                                                 <option value="">--请选择--</option>
                                                                 <?php foreach ($provinceList as $p):?>
                                                                     <option value="<?= $p['id'] ?>"><?= $p['name'] ?></option>
@@ -63,19 +64,34 @@
                                                     </div>
                                                 </td>
                                                 <td >
-                                                    <label><input type="number" name="delivery[rule][first][]" value="1" required="" class="am-field-valid">
+                                                    <label><input type="number" name="delivery[rule][first][0]"
+                                                                  value="1" required=""
+                                                                  class="am-field-valid first">
                                                     </label>
                                                 </td><td>
                                                     <label>
-                                                    <input type="number" name="delivery[rule][first_fee][]" value="0.00" required="" class="am-field-valid">
+                                                    <input type="number" name="delivery[rule][first_fee][0]"
+                                                           value="0.00" required=""
+                                                           class="am-field-valid first_fee">
                                                     </label>
                                                 </td><td>
-                                                    <label><input type="number" name="delivery[rule][additional][]" value="0" class="am-field-valid"></label>
+                                                    <label><input type="number" name="delivery[rule][additional][0]"
+                                                                  value="0"
+                                                                  class="am-field-valid additional"></label>
                                                 </td><td>
                                                     <label>
-                                                    <input type="number" name="delivery[rule][additional_fee][]" value="0.00" class="am-field-valid">
+                                                    <input type="number" name="delivery[rule][additional_fee][0]"
+                                                           value="0.00" class="am-field-valid additional_fee">
                                                     </label>
                                                 </td>
+                                                <td>
+                                                    <a  href="#" onclick="addDelivery(this)" class="am-icon-plus-square add_operation"></a>
+                                                    <a href="#" style="display: none" onclick="removeDelivery(this)" class="am-icon-minus-square del_operation"></a>
+                                                </td>
+                                            </tr>
+
+                                            <tr id="latest_tr">
+                                                <td colspan="6"></td>
                                             </tr>
                                             </tbody>
                                         </table>
@@ -103,9 +119,14 @@
         </div>
     </div>
 </div>
-<div class="regional-choice"></div>
 <script src="assets/store/js/delivery.js"></script>
 <script>
+    var tpl_obj=$('#regional_choice_tpl');
+    var latest_tr=$('#latest_tr');
+    var tplNode = $(tpl_obj.clone());
+
+    tplNode.find('.add_operation').css('display','none');
+    tplNode.find('.del_operation').removeAttr('style');
     $(function () {
 
 
@@ -120,18 +141,33 @@
 
     function findCity(obj,key) {
       var pid = $(obj).val();
+      var name =  $(obj).attr('name')
       var select = '<label class="am-checkbox-inline" style="padding:0">' +
-        '<select name=delivery[rule][region]['+pid+'] onchange=findCity(this,'+pid+')><option value="">全部</option>';
+        '<select name='+name+' onchange=findCity(this)><option value="">全部</option>';
       $.post(url,{pid:pid},function (res) {
         if (res.data.length === 0) return;
         for (var i=0;i<res.data.length;i++){
           select += '<option value="'+res.data[i].id+'">'+res.data[i].name+'</option>'
         }
         select += '<select></label>';
-        $(obj).nextAll().each(function () {
+        $(obj).parent().nextAll().each(function () {
           $(this).remove()
-        })
-        $(select).insertAfter($(obj).parent())
+        });
+        $(select).insertAfter($(obj).parent());
       })
+    }
+
+    function addDelivery(obj) {
+      var l = $('.delivery_tr').length;
+      tplNode.find('select').attr('name','delivery[rule][region]['+l+'][]');
+      tplNode.find('.first').attr('name','delivery[rule][first]['+l+']');
+      tplNode.find('.first_fee').attr('name','delivery[rule][first_fee]['+l+']');
+      tplNode.find('.additional').attr('name','delivery[rule][additional]['+l+']');
+      tplNode.find('.additional_fee').attr('name','delivery[rule][additional_fee]['+l+']');
+      latest_tr.parent().append('<tr class="delivery_tr">'+tplNode.html()+'</tr>')
+
+    }
+    function removeDelivery(obj) {
+      $(obj).parent().parent().remove()
     }
 </script>

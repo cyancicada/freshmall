@@ -3,8 +3,11 @@
 namespace app\store\controller\setting;
 
 use app\store\controller\Controller;
+use app\store\model\DeliveryRule;
 use app\store\model\Region;
 use app\store\model\Delivery as DeliveryModel;
+use think\Db;
+use think\Request;
 
 /**
  * 配送设置
@@ -78,14 +81,25 @@ class Delivery extends Controller
      * @throws \think\exception\DbException
      * @throws \think\exception\PDOException
      */
-    public function edit($delivery_id)
+    public function edit($delivery_id=0)
     {
         // 模板详情
         $model = DeliveryModel::detail($delivery_id);
         if (!$this->request->isAjax()) {
             // 获取所有地区
-            $regionData = json_encode(Region::getCacheTree());
-            return $this->fetch('edit', compact('regionData','model'));
+            $regionData = [];
+            $provinceList = Region::getIdByPId();
+            $info = DeliveryRule::getAllRulesByDeliveryId($delivery_id);
+            foreach ($info as $item){
+                $area=Region::useGlobalScope(false)->whereIn('id',$item->region)
+                    ->order('level','asc')->field(['group_concat(name) AS name'])->find()->toArray();
+                $item->area = $area['name'];
+            }
+            return $this->fetch('edit', compact('regionData','model','provinceList','info'));
+        }
+        if ($this->request->post('pid')){
+            $pid = $this->request->post('pid');
+            return $this->renderSuccess('添加成功',null, Region::getIdByPId($pid));
         }
         // 更新记录
         if ($model->edit($this->postData('delivery'))) {

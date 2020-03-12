@@ -39,59 +39,64 @@
                                          am-table-centered am-margin-bottom-xs">
                                             <tbody>
                                             <tr>
-                                                <th width="42%">可配送区域</th>
+                                                <th width="50%">可配送区域</th>
                                                 <th>
-                                                    <span class="first">
-                                                        <?= $model['method']['value'] == 10 ? '首件 (个)' : '首重 (Kg)' ?>
-                                                    </span>
+                                                    <span class="first">首件 (个)</span>
                                                 </th>
                                                 <th>运费 (元)</th>
                                                 <th>
-                                                    <span class="additional">
-                                                          <?= $model['method']['value'] == 10 ? '续件 (个)' : '续重 (Kg)' ?>
-                                                    </span>
+                                                    <span class="additional">续件 (个)</span>
                                                 </th>
                                                 <th>续费 (元)</th>
+                                                <th>操作</th>
                                             </tr>
-                                            <?php foreach ($model['rule'] as $item) : ?>
-                                                <tr>
-                                                    <td class="am-text-left">
-                                                        <p class="selected-content am-margin-bottom-xs">
-                                                            <?= $item['region_content'] ?>
-                                                        </p>
-                                                        <p class="operation am-margin-bottom-xs">
-                                                            <a class="edit" href="javascript:;">编辑</a>
-                                                            <a class="delete" href="javascript:;">删除</a>
-                                                        </p>
-                                                        <input type="hidden" name="delivery[rule][region][]"
-                                                               value="<?= $item['region'] ?>">
-                                                    </td>
-                                                    <td>
-                                                        <input type="number" name="delivery[rule][first][]"
-                                                               value="<?= $item['first'] ?>" required>
-                                                    </td>
-                                                    <td>
-                                                        <input type="number" name="delivery[rule][first_fee][]"
-                                                               value="<?= $item['first_fee'] ?>" required>
-                                                    </td>
-                                                    <td>
-                                                        <input type="number" name="delivery[rule][additional][]"
-                                                               value="<?= $item['additional'] ?>">
-                                                    </td>
-                                                    <td>
-                                                        <input type="number" name="delivery[rule][additional_fee][]"
-                                                               value="<?= $item['additional_fee'] ?>">
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                            <tr>
-                                                <td colspan="5" class="am-text-left">
-                                                    <a class="add-region am-btn am-btn-default am-btn-xs"
-                                                       href="javascript:;">
-                                                        <i class="iconfont icon-dingwei"></i>
-                                                        点击添加可配送区域和运费
-                                                    </a>
+                                            <?php foreach ($info as $k=>$row):?>
+                                            <tr <?php if($k==0): ?>id="regional_choice_tpl"<?php endif;?> class="delivery_tr">
+                                                <td class="am-text-left am-form-inline">
+                                                    <p><?= $row->area ?></p>
+                                                    <div class="am-form-group">
+                                                        <label class="am-checkbox-inline" style="padding:0">
+                                                            <select name="delivery[rule][region][<?= $k ?>][]" onchange="findCity(this)" >
+                                                                <option value="">--请选择--</option>
+                                                                <?php foreach ($provinceList as $p):?>
+                                                                    <option value="<?= $p['id'] ?>"><?= $p['name'] ?></option>
+                                                                <?php endforeach;?>
+                                                            </select>
+                                                        </label>
+                                                    </div>
                                                 </td>
+                                                <td >
+                                                    <label><input type="number" name="delivery[rule][first][<?= $k ?>]"
+                                                                  value="<?= $row->first ?>" required=""
+                                                                  class="am-field-valid first">
+                                                    </label>
+                                                </td><td>
+                                                    <label>
+                                                        <input type="number" name="delivery[rule][first_fee][<?= $k ?>]"
+                                                               value="<?= $row->first_fee ?>" required=""
+                                                               class="am-field-valid first_fee">
+                                                    </label>
+                                                </td><td>
+                                                    <label><input type="number" name="delivery[rule][additional][<?= $k ?>]"
+                                                                  value="<?= $row->additional ?>"
+                                                                  class="am-field-valid additional"></label>
+                                                </td><td>
+                                                    <label>
+                                                        <input type="number" name="delivery[rule][additional_fee][<?= $k ?>]"
+                                                               value="<?= $row->additional_fee ?>" class="am-field-valid additional_fee">
+                                                    </label>
+                                                </td>
+                                                <td>
+                                                    <?php if($k==0): ?>
+                                                        <a  href="#" onclick="addDelivery(this)" class="am-icon-plus-square add_operation"></a>
+                                                    <?php else: ?>
+                                                    <a href="#" onclick="removeDelivery(this)" class="am-icon-minus-square del_operation"></a>
+                                                <?php endif;?>
+                                                </td>
+                                            </tr>
+                                            <?php endforeach;?>
+                                            <tr id="latest_tr">
+                                                <td colspan="6"></td>
                                             </tr>
                                             </tbody>
                                         </table>
@@ -122,23 +127,53 @@
 <div class="regional-choice"></div>
 <script src="assets/store/js/delivery.js"></script>
 <script>
-    $(function () {
+  var tpl_obj=$('#regional_choice_tpl');
+  var latest_tr=$('#latest_tr');
+  var tplNode = $(tpl_obj.clone());
 
-        // 初始化区域选择界面
-        var datas = JSON.parse('<?= $regionData ?>');
+  tplNode.find('.add_operation').css('display','none');
+  tplNode.find('.del_operation').removeAttr('style');
+  $(function () {
 
-        // 配送区域表格
-        new Delivery({
-            table: '.regional-table',
-            regional: '.regional-choice',
-            datas: datas
-        });
 
-        /**
-         * 表单验证提交
-         * @type {*}
-         */
-        $('#my-form').superForm();
+    /**
+     * 表单验证提交
+     * @type {*}
+     */
+    $('#my-form').superForm();
 
-    });
+  });
+  var url='<?= url() ?>';
+
+  function findCity(obj,key) {
+    var pid = $(obj).val();
+    var name =  $(obj).attr('name')
+    var select = '<label class="am-checkbox-inline" style="padding:0">' +
+      '<select name='+name+' onchange=findCity(this)><option value="">全部</option>';
+    $.post(url,{pid:pid},function (res) {
+      if (res.data.length === 0) return;
+      for (var i=0;i<res.data.length;i++){
+        select += '<option value="'+res.data[i].id+'">'+res.data[i].name+'</option>'
+      }
+      select += '<select></label>';
+      $(obj).parent().nextAll().each(function () {
+        $(this).remove()
+      });
+      $(select).insertAfter($(obj).parent());
+    })
+  }
+
+  function addDelivery(obj) {
+    var l = $('.delivery_tr').length;
+    tplNode.find('select').attr('name','delivery[rule][region]['+l+'][]');
+    tplNode.find('.first').attr('name','delivery[rule][first]['+l+']');
+    tplNode.find('.first_fee').attr('name','delivery[rule][first_fee]['+l+']');
+    tplNode.find('.additional').attr('name','delivery[rule][additional]['+l+']');
+    tplNode.find('.additional_fee').attr('name','delivery[rule][additional_fee]['+l+']');
+    latest_tr.parent().append('<tr class="delivery_tr">'+tplNode.html()+'</tr>')
+
+  }
+  function removeDelivery(obj) {
+    $(obj).parent().parent().remove()
+  }
 </script>

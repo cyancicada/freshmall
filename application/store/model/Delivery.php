@@ -58,16 +58,21 @@ class Delivery extends DeliveryModel
      */
     private function createDeliveryRule($data)
     {
-        $save = [];
-        $connt = count($data['region']);
-        for ($i = 0; $i < $connt; $i++) {
+        $save           = [];
+        $region         = isset($data['region']) ? $data['region'] : [];
+        $first          = isset($data['first']) ? $data['first'] : [];
+        $first_fee      = isset($data['first_fee']) ? $data['first_fee'] : [];
+        $additional     = isset($data['additional']) ? $data['additional'] : [];
+        $additional_fee = isset($data['additional_fee']) ? $data['additional_fee'] : [];
+
+        foreach ($region as $i => $item) {
             $save[] = [
-                'region' => $data['region'][$i],
-                'first' => $data['first'][$i],
-                'first_fee' => $data['first_fee'][$i],
-                'additional' => $data['additional'][$i],
-                'additional_fee' => $data['additional_fee'][$i],
-                'wxapp_id' => self::$wxapp_id
+                'region'         => implode(',', $item),
+                'first'          => isset($first[$i]) ? $first[$i] :'',
+                'first_fee'      => isset($first_fee[$i]) ? $first_fee[$i] :'',
+                'additional'     => isset($additional[$i]) ? $additional[$i] :'',
+                'additional_fee' => isset($additional_fee[$i]) ? $additional_fee[$i] :'',
+                'wxapp_id'       => self::$wxapp_id
             ];
         }
         $this->rule()->delete();

@@ -52,4 +52,15 @@ class DeliveryRule extends DeliveryRuleModel
         return mb_substr($str, 0, -1, 'utf-8');
     }
 
+    /**
+     *
+     * @author kyang
+     */
+    public static function getAllRulesByDeliveryId($deliveryId){
+
+        return static::where('delivery_id',$deliveryId)->select();
+
+        //return static::where('delivery_id',$deliveryId)->select();
+    }
+
 }
