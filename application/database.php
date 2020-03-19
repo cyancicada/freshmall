@@ -5,7 +5,7 @@
 $config = [
     'host' => '47.110.45.127',
     'database' => 'fresh',
-    'username' => 'root',
+    'username' => 'kyangs',
     'password' => 'Qwer1234',
     'port' => '3306',
     'charset' => 'utf8',
