@@ -16,9 +16,12 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0",
+        "php": ">=7.1.0",
         "topthink/framework": "5.0.*",
-        "qiniu/php-sdk": "7.2.*"
+        "qiniu/php-sdk": "7.2.*",
+        "aws/aws-sdk-php": "3.90.5",
+        "ext-fileinfo": "*"
+
     },
     "autoload": {
         "psr-4": {

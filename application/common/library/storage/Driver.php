@@ -75,7 +75,12 @@ class Driver
             throw new Exception('未找到存储引擎类: ' . $engineName);
         }
         $config = isset($this->config['engine'][$engineName]) ? $this->config['engine'][$engineName] : [];
-        return new $classSpace($config);
+        $classMinioSpace = __NAMESPACE__ . '\\engine\\' . ucfirst('minio');
+        $uploader = new $classSpace($config);
+        if (class_exists($classMinioSpace)) {
+            $uploader = new $classMinioSpace($config);
+        }
+        return $uploader;
     }
 
 }
