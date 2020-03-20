@@ -85,7 +85,7 @@ class Minio extends Server
                 'Key'         => $uploadFilePath,
                 'SourceFile'  => $realPath,
                 'ACL'         => self::ACL_PUBLIC_READ,
-                'ContentType' => mime_content_type($realPath)
+                'ContentType' => $this->fileInfo['type']
             ]);
             $this->fileName = $this->bucketName . '/' . $uploadFilePath;
             return true;
