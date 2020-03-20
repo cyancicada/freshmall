@@ -19,7 +19,7 @@
                                     </label>
                                     <label class="am-radio-inline">
                                         <input type="radio" name="storage[default]" value="qiniu" data-am-ucheck
-                                            <?= $values['default'] === 'qiniu' ? 'checked' : '' ?>> 七牛云存储
+                                            <?= $values['default'] === 'qiniu' ? 'checked' : '' ?>> 云存储
                                     </label>
                                 </div>
                             </div>
