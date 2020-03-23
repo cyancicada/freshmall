@@ -12,4 +12,4 @@ define('WEB_PATH', __DIR__ . '/');
 define('APP_PATH', WEB_PATH . '../source/application/');
 
 // 加载框架引导文件
-require APP_PATH . '../thinkphp/start.php';
+require __DIR__ . '/../thinkphp/start.php';
