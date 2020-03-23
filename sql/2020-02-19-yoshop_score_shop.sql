@@ -10,3 +10,6 @@ CREATE TABLE `yoshop_score_shop` (
   `update_time` int(11) unsigned DEFAULT '0' COMMENT '更新时间',
   PRIMARY KEY (`score_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='积分可兑换商品';
+
+
+alter table yoshop_order add column claim_delivery_time varchar(20) not null default '' comment '用户选择的配送时间' after delivery_time;
