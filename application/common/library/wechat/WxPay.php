@@ -109,6 +109,7 @@ class WxPay
 //<transaction_id><![CDATA[4200000146201806242438472701]]></transaction_id>
 //</xml>
 //EOF;
+        Log::info(file_get_contents('php://input'));
         if (!$xml = file_get_contents('php://input')) {
             $this->returnCode(false, 'Not found DATA');
         }
@@ -117,6 +118,8 @@ class WxPay
         // 记录日志
         $this->doLogs($xml);
         $this->doLogs($data);
+        Log::info($data);
+        Log::info($xml);
         // 订单信息
         $order = $OrderModel->payDetail($data['out_trade_no']);
         empty($order) && $this->returnCode(true, '订单不存在');
