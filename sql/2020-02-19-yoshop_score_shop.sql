@@ -13,3 +13,4 @@ CREATE TABLE `yoshop_score_shop` (
 
 
 alter table yoshop_order add column claim_delivery_time varchar(20) not null default '' comment '用户选择的配送时间' after delivery_time;
+alter table yoshop_order add column claim_time_range varchar(20) not null default '' comment '用户选择的配送范围' after delivery_time;
