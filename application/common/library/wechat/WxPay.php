@@ -6,6 +6,7 @@ use app\common\model\Wxapp as WxappModel;
 use app\task\model\Setting as SettingModel;
 use app\common\library\sms\Driver as SmsDriver;
 use app\common\exception\BaseException;
+use think\Log;
 
 /**
  * 微信支付
@@ -60,6 +61,8 @@ class WxPay
         $url = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
         $result = $this->postXmlCurl($this->toXml($params), $url);
         $prepay = $this->fromXml($result);
+        Log::info(var_export($prepay,true));
+        Log::info(var_export($params,true));
         // 请求失败
         if ($prepay['return_code'] === 'FAIL') {
             throw new BaseException(['msg' => $prepay['return_msg'], 'code' => -10]);
