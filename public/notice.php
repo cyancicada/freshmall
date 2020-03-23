@@ -9,7 +9,7 @@ $_GET['s'] = '/task/notify/order';
 define('WEB_PATH', __DIR__ . '/');
 
 // 定义应用目录
-define('APP_PATH', WEB_PATH . '../source/application/');
+define('APP_PATH', WEB_PATH . '../application/');
 
 // 加载框架引导文件
-require __DIR__ . '/../thinkphp/start.php';
+require WEB_PATH . '../thinkphp/start.php';
