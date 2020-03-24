@@ -44,7 +44,7 @@ class WxPay
         // API参数
         $params = [
             'appid' => $this->config['app_id'],
-            'attach' => 'test',
+            'attach' => $this->config['app_name'],//'test',//app_name
             'body' => $order_no,
             'mch_id' => $this->config['mchid'],
             'nonce_str' => $nonceStr,
