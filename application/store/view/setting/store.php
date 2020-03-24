@@ -23,12 +23,16 @@
                                 </label>
                                 <div class="am-u-sm-9">
                                     <label class="am-radio-inline">
-                                        <input type="radio" name="store[is_notice]" value="1"
+                                        <input type="radio" name="store[is_notice]"
+                                               value="1"
+                                                <?= isset($values['is_notice']) && intval($values['is_notice'])==1 ? 'checked' : '' ?>
                                                data-am-ucheck> 开启
                                     </label>
                                     <label class="am-radio-inline">
-                                        <input type="radio" name="store[is_notice]" value="0"
-                                               data-am-ucheck checked> 关闭
+                                        <input type="radio" name="store[is_notice]"
+                                               value="0"
+                                            <?= isset($values['is_notice']) && intval($values['is_notice'])== 0 ? 'checked' : '' ?>
+                                               data-am-ucheck> 关闭
                                     </label>
                                 </div>
                             </div>
@@ -38,7 +42,10 @@
                                     首页公告内容
                                 </label>
                                 <div class="am-u-sm-9">
-                                    <input type="text" class="tpl-form-input" name="store[notice]" value="">
+                                    <input type="text" class="tpl-form-input"
+                                           name="store[notice]"
+                                           value="<?= isset($values['notice'])  ? $values['notice'] : '' ?>"
+                                    >
                                 </div>
                             </div>
                             <div class="am-form-group">
