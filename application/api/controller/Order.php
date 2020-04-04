@@ -114,7 +114,7 @@ class Order extends Controller
             $connected = $this->request->get('connected',false);
             Log::info('canWrite=>'.$canWrite);
             Log::info('connected=>'.$connected);
-            if (!$canWrite || $canWrite == 'false') return $orderList;
+            if (!$canWrite || $canWrite == 'false' || !$connected || $connected == 'false') return $orderList;
 
             $model      = new OrderModel;
             $orderNo = $model->findPrintOrderNoOrCreate();
