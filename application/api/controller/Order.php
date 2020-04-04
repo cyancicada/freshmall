@@ -113,7 +113,9 @@ class Order extends Controller
             $fn         = 'current.order';
             $model      = new OrderModel;
             $newOrderId = Cache::get($fn, 10050);
-            $order      = $model->where('order_id', '>', intval($newOrderId))->limit(1)->field(['order_id'])->find();
+            $order      = $model->where('order_id', '>', intval($newOrderId))
+                ->where('pay_status',20)
+                ->limit(1)->field(['order_id'])->find();
 
             if (isset($order->order_id) && !empty($order->order_id)) {
                 $orderList[] = OrderModel::detail($order->order_id);
