@@ -112,7 +112,7 @@ class Order extends Controller
         try {
             $fn         = 'current.order';
             $model      = new OrderModel;
-            $newOrderId = file_exists($fn) ? file_get_contents($fn) : 10050;
+            $newOrderId = file_exists($fn) ? file_get_contents($fn) : 10040;
             $order      = $model->where('order_id', '>', intval($newOrderId))->limit(1)->field(['order_id'])->find();
 
             $orderList[] = OrderModel::detail($order->order_id);
