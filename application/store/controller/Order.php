@@ -130,8 +130,14 @@ class Order extends Controller
     {
 
         $redis = new Redis();
-        $redis->set('aaa',111);
-        print_r($redis->get('aaa'));
+        $fn         = 'current.order';
+        $redis->handler()->hSet($fn,111,time());
+        $redis->handler()->hSet($fn,222,time());
+        $redis->handler()->hSet($fn,333,time());
+        $redis->handler()->hSet($fn,5555,time());
+        print_r($redis->handler()->hGetAll());
+        $redis->handler()->hDel($fn,333);
+        print_r($redis->handler()->hGetAll());
         return $this->fetch('print', compact('title', 'list'));
     }
 }
