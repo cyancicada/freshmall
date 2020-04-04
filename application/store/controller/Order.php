@@ -3,6 +3,7 @@
 namespace app\store\controller;
 
 use app\store\model\Order as OrderModel;
+use Redis;
 
 /**
  * 订单管理
@@ -128,8 +129,9 @@ class Order extends Controller
     public function print($order_id = null)
     {
 
-        $model = new OrderModel;
-        $list  = $model->getList([]);
+        $redis = new Redis();
+        $redis->set('aaa',111);
+        print_r($redis->get('aaa'));
         return $this->fetch('print', compact('title', 'list'));
     }
 }
