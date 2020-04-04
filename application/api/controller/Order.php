@@ -106,20 +106,25 @@ class Order extends Controller
     /** 打单服务
      * @return array
      */
-    public function printOrder(){
+    public function printOrder()
+    {
         $orderList = [];
-        try{
+        try {
+            $fn         = 'current.order';
+            $model      = new OrderModel;
+            $newOrderId = file_exists($fn) ? file_get_contents($fn) : 10050;
+            $order      = $model->where('order_id', '>', intval($newOrderId))->limit(1)->field(['order_id'])->find();
 
-            $model = new OrderModel;
-            $orders = $model->order('order_id','desc')->limit(2)->field(['order_id'])->select();
-            foreach ($orders as $item) $orderList[] = OrderModel::detail($item->order_id);
+            $orderList[] = OrderModel::detail($order->order_id);
+            file_put_contents($fn, $order->order_id);
             return $this->renderSuccess($orderList);
 
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
 
         }
         return $this->renderSuccess($orderList);
     }
+
     /**
      * 构建微信支付
      * @param $order_no
@@ -135,7 +140,6 @@ class Order extends Controller
         $WxPay    = new WxPay($wxConfig);
         return $WxPay->unifiedorder($order_no, $open_id, $pay_price);
     }
-
 
 
 }
