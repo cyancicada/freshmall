@@ -19,7 +19,7 @@ class Order extends Controller
     public function delivery_list()
     {
         return $this->getList('待发货订单列表', [
-            'pay_status' => 20,
+            'pay_status'      => 20,
             'delivery_status' => 10
         ]);
     }
@@ -32,9 +32,9 @@ class Order extends Controller
     public function receipt_list()
     {
         return $this->getList('待收货订单列表', [
-            'pay_status' => 20,
+            'pay_status'      => 20,
             'delivery_status' => 20,
-            'receipt_status' => 10
+            'receipt_status'  => 10
         ]);
     }
 
@@ -88,8 +88,8 @@ class Order extends Controller
     private function getList($title, $filter = [])
     {
         $model = new OrderModel;
-        $list = $model->getList($filter);
-        return $this->fetch('index', compact('title','list'));
+        $list  = $model->getList($filter);
+        return $this->fetch('index', compact('title', 'list'));
     }
 
     /**
@@ -120,4 +120,16 @@ class Order extends Controller
         return $this->renderError($error);
     }
 
+    /** 订单打印
+     * @param null $order_id
+     * @return array
+     * @throws \think\exception\DbException
+     */
+    public function print($order_id = null)
+    {
+
+        $model = new OrderModel;
+        $list  = $model->getList([]);
+        return $this->fetch('print', compact('title', 'list'));
+    }
 }

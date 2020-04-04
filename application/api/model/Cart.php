@@ -2,6 +2,7 @@
 
 namespace app\api\model;
 
+use app\common\model\BaseModel;
 use think\Cache;
 use app\common\library\helper;
 
@@ -107,6 +108,7 @@ class Cart
         // 订单总运费金额
         $expressPrice = $allExpressPrice ? Delivery::freightRule($allExpressPrice) : 0.00;
         return [
+            'time_range'=>BaseModel::$timeRange,
             'goods_list' => $cartList,                       // 商品列表
             'order_total_num' => $this->getTotalNum(),       // 商品总数量
             'order_total_price' => helper::number2($orderTotalPrice),              // 商品总金额 (不含运费)

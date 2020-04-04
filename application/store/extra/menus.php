@@ -92,6 +92,10 @@ return [
                 'name' => '全部订单',
                 'index' => 'order/all_list',
             ],
+            [
+                'name' => '订单打印',
+                'index' => 'order/print',
+            ],
         ]
     ],
     'user' => [
