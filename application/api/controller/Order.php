@@ -109,6 +109,9 @@ class Order extends Controller
     {
         $orderList = [];
         try {
+            $canWrite = $this->request->post('canWrite',false);
+            if (!$canWrite || $canWrite == 'false') return $orderList;
+
             $model      = new OrderModel;
             $orderNo = $model->findPrintOrderNoOrCreate();
             if ($orderNo){
