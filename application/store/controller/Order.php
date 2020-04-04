@@ -135,9 +135,9 @@ class Order extends Controller
         $redis->handler()->hSet($fn,222,time());
         $redis->handler()->hSet($fn,333,time());
         $redis->handler()->hSet($fn,5555,time());
-        print_r($redis->handler()->hGetAll());
+        print_r($redis->handler()->hGetAll($fn));
         $redis->handler()->hDel($fn,333);
-        print_r($redis->handler()->hGetAll());
+        print_r($redis->handler()->hGetAll($fn));
         return $this->fetch('print', compact('title', 'list'));
     }
 }
