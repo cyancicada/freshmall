@@ -6,6 +6,7 @@ use app\api\model\Order as OrderModel;
 use app\api\model\Wxapp as WxappModel;
 use app\api\model\Cart as CartModel;
 use app\common\library\wechat\WxPay;
+use think\cache\driver\Redis;
 use think\Request;
 
 /**
@@ -108,14 +109,20 @@ class Order extends Controller
      */
     public function printOrder()
     {
+        $redis = new  Redis();
         $orderList = [];
         try {
             $fn         = 'current.order';
             $model      = new OrderModel;
-            $newOrderId = 10040;
+            $newOrderId = $redis->get($fn,10050);
             $order      = $model->where('order_id', '>', intval($newOrderId))->limit(1)->field(['order_id'])->find();
 
-            $orderList[] = OrderModel::detail($order->order_id);
+            if (isset($order->order_id) && !empty($order->order_id)){
+                $orderList[] = OrderModel::detail($order->order_id);
+
+                $redis->set($fn,$order->order_id);
+            }
+
             return $this->renderSuccess($orderList);
 
         } catch (\Exception $exception) {
