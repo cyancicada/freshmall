@@ -6,6 +6,7 @@ use app\api\model\Order as OrderModel;
 use app\api\model\Wxapp as WxappModel;
 use app\api\model\Cart as CartModel;
 use app\common\library\wechat\WxPay;
+use think\Log;
 
 /**
  * 订单控制器
@@ -109,7 +110,8 @@ class Order extends Controller
     {
         $orderList = [];
         try {
-            $canWrite = $this->request->post('canWrite',false);
+            $canWrite = $this->request->get('canWrite',false);
+            Log::info('canWrite=>'.$canWrite);
             if (!$canWrite || $canWrite == 'false') return $orderList;
 
             $model      = new OrderModel;
