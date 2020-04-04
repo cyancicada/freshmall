@@ -2,6 +2,7 @@
 
 namespace app\common\model;
 
+use think\cache\driver\Redis;
 use think\Hook;
 
 /**
@@ -13,6 +14,8 @@ class Order extends BaseModel
 {
     protected $name = 'order';
 
+    const PRINT_ORDER_QUINE = 'order:current:print_list';
+
     /**
      * 订单模型初始化
      */
@@ -22,6 +25,28 @@ class Order extends BaseModel
         // 监听订单处理事件
         $static = new static;
         Hook::listen('order', $static);
+    }
+
+
+    /** 记录已经支付的订单号,等待打印机打单
+     * @param null $currentNo
+     */
+    public function findPrintOrderNoOrCreate($orderNo = null)
+    {
+        $redis     = new Redis();
+        $currentNo = '';
+        if (!empty($orderNo)) {
+            $redis->handler()->hSet(self::PRINT_ORDER_QUINE, $orderNo, $orderNo);
+            return $currentNo;
+        }
+        if ($redis->handler()->exists(self::PRINT_ORDER_QUINE)) {
+            $hKeys     = $redis->handler()->hKeys(self::PRINT_ORDER_QUINE);
+            $hKey      = current($hKeys);
+            $currentNo = $redis->handler()->hGet(self::PRINT_ORDER_QUINE, $hKey);
+            $redis->handler()->hDel(self::PRINT_ORDER_QUINE, $hKey);
+            return $currentNo;
+        }
+        return $currentNo;
     }
 
     /**

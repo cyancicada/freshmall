@@ -82,12 +82,12 @@ class WxPay
 
     /**
      * 支付成功异步通知
-     * @param \app\task\model\Order $OrderModel
+     * @param \app\task\model\Order $orderModel
      * @throws BaseException
      * @throws \Exception
      * @throws \think\exception\DbException
      */
-    public function notify($OrderModel)
+    public function notify($orderModel)
     {
 //        $xml = <<<EOF
 //<xml><appid><![CDATA[wx62f4cad175ad0f90]]></appid>
@@ -118,10 +118,8 @@ class WxPay
         // 记录日志
         $this->doLogs($xml);
         $this->doLogs($data);
-        Log::info($data);
-        Log::info($xml);
         // 订单信息
-        $order = $OrderModel->payDetail($data['out_trade_no']);
+        $order = $orderModel->payDetail($data['out_trade_no']);
         empty($order) && $this->returnCode(true, '订单不存在');
         // 小程序配置信息
         $wxConfig = WxappModel::getWxappCache($order['wxapp_id']);
@@ -141,6 +139,8 @@ class WxPay
             $order->updatePayStatus($data['transaction_id']);
             // 发送短信通知
             $this->sendSms($order['wxapp_id'], $order['order_no']);
+            //记录已经支付的id，供打印机打印
+            $orderModel->findPrintOrderNoOrCreate($order['order_no']);
             // 返回状态
             $this->returnCode(true, 'OK');
         }

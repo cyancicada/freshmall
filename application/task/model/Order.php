@@ -37,8 +37,8 @@ class Order extends OrderModel
         $GoodsModel->updateStockSales($this['goods']);
         // 更新订单状态
         $this->save([
-            'pay_status' => 20,
-            'pay_time' => time(),
+            'pay_status'     => 20,
+            'pay_time'       => time(),
             'transaction_id' => $transaction_id,
         ]);
         Db::commit();
