@@ -111,7 +111,9 @@ class Order extends Controller
         $orderList = [];
         try {
             $canWrite = $this->request->get('canWrite',false);
+            $connected = $this->request->get('connected',false);
             Log::info('canWrite=>'.$canWrite);
+            Log::info('connected=>'.$connected);
             if (!$canWrite || $canWrite == 'false') return $orderList;
 
             $model      = new OrderModel;
