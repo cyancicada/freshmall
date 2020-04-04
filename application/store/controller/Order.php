@@ -3,7 +3,7 @@
 namespace app\store\controller;
 
 use app\store\model\Order as OrderModel;
-use Redis;
+use think\cache\driver\Redis;
 
 /**
  * 订单管理
