@@ -24,13 +24,13 @@ class Index extends Controller
         // 当前用户信息
         $userInfo = $this->getUser();
         // 订单总数
-        $model = new OrderModel;
-        $orderCount = [
-            'payment' => $model->getCount($userInfo['user_id'], 'payment'),
+        $model                = new OrderModel;
+        $orderCount           = [
+            'payment'  => $model->getCount($userInfo['user_id'], 'payment'),
             'received' => $model->getCount($userInfo['user_id'], 'received'),
         ];
-        $isPrint = PrintOrder::isPrintByOpenId($userInfo['open_id']);
-        return $this->renderSuccess(compact('userInfo', 'orderCount','isPrint'));
+        $userInfo['is_print'] = PrintOrder::isPrintByOpenId($userInfo['open_id']);
+        return $this->renderSuccess(compact('userInfo', 'orderCount', 'isPrint'));
     }
 
 }
