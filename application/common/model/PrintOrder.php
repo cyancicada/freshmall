@@ -22,7 +22,7 @@ class PrintOrder extends BaseModel
 
         if (empty($openId)) return false;
 
-        $res = self::where('open_id', '=', $openId)->value('open_id');
+        $res = self::useGlobalScope(false)->where('open_id', '=', $openId)->value('open_id');
 
         return !empty($res) && $res == $openId;
     }
