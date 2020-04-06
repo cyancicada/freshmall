@@ -126,18 +126,14 @@ class Order extends Controller
      * @return array
      * @throws \think\exception\DbException
      */
-    public function print($order_id = null)
+    public function print()
     {
-
-        $redis = new Redis();
-        $fn         = 'current.order';
-        $redis->handler()->hSet($fn,111,time());
-        $redis->handler()->hSet($fn,222,time());
-        $redis->handler()->hSet($fn,333,time());
-        $redis->handler()->hSet($fn,5555,time());
-        print_r($redis->handler()->hGetAll($fn));
-        $redis->handler()->hDel($fn,333);
-        print_r($redis->handler()->hGetAll($fn));
-        return $this->fetch('print', compact('title', 'list'));
+        $orderSn = $this->request->post('order_sn',null);
+        if (!$this->request->isPost() && !empty($orderSn)) {
+            $model = new OrderModel;
+            $model->findPrintOrderNoOrCreate($$orderSn);
+            return $this->renderSuccess();
+        }
+        return $this->fetch('print');
     }
 }
