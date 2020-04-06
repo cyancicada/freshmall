@@ -7,10 +7,9 @@
                             <form id="delivery" class="my-form am-form tpl-form-line-form" method="post"
                                   action="<?= url('order/print') ?>">
                                 <div class="am-form-group">
-                                    <label class="am-u-sm-3 am-u-lg-2 am-form-label form-require">订单号： </label>
+                                    <label for="order_sn" class="am-u-sm-3 am-u-lg-2 am-form-label form-require">订单号： </label>
                                     <div class="am-u-sm-9 am-u-end">
-                                        <input type="text" class="tpl-form-input" name="order_sn"
-                                               required>
+                                        <input type="text" id="order_sn" class="tpl-form-input" name="order_sn"/>
                                         <small>多个订单号用英文逗号,隔开；如21231,21321,....</small>
                                     </div>
                                 </div>
