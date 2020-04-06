@@ -128,10 +128,10 @@ class Order extends Controller
      */
     public function print()
     {
-        $orderSn = $this->request->post('order_sn',null);
+        $orderSn = $this->request->post('order_sn', null);
         if ($this->request->isPost() && !empty($orderSn)) {
             $model = new OrderModel;
-            foreach (explode(',',$orderSn) as $sn) {
+            foreach (explode(',', str_replace('，', ',', $orderSn)) as $sn) {
                 if (empty($sn)) continue;
                 $model->findPrintOrderNoOrCreate($sn);
             }
