@@ -95,8 +95,8 @@ class Cart
             $goods['goods_total_weight'] = bcmul($goods['goods_sku']['goods_weight'], $cart['goods_num'], 2);
             // 验证用户收货地址是否存在运费规则中
             if ($intraRegion = $goods['delivery']->checkAddress($cityId)) {
-//                $goods['express_price'] = $goods['delivery']->calcTotalFee(
-//                    $cart['goods_num'], $goods['goods_total_weight'], $cityId);
+                $goods['express_price'] = $goods['delivery']->calcTotalFee(
+                    $cart['goods_num'], $goods['goods_total_weight'], $cityId);
                 if (isset($cart['goods_num'])) $goodsNum[]    = intval($cart['goods_num']);
                 if (isset($cart['goods_total_weight'])) $goodsWeight[] = intval($goods['goods_total_weight']);
             } else {
@@ -108,7 +108,7 @@ class Cart
         // 商品总金额
         $orderTotalPrice = helper::getArrayColumnSum($cartList, 'total_price');
         // 所有商品的运费金额
-//        $allExpressPrice = helper::getArrayColumn($cartList, 'express_price');
+        $allExpressPrice = helper::getArrayColumn($cartList, 'express_price');
         // 订单总运费金额
 //        $expressPrice = $allExpressPrice ? Delivery::freightRule($allExpressPrice) : 0.00;
         $expressPrice = Delivery::expressRule($orderTotalPrice,array_sum($goodsNum),array_sum($goodsWeight),$cityId);
