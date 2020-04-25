@@ -90,5 +90,24 @@ class Delivery extends DeliveryModel
         }
         return $expressPrice;
     }
+    /**
+     * 根据运费组合策略 计算最终运费
+     * @param $allExpressPrice
+     * @return float|int|mixed
+     */
+    public static function expressRule($orderTotalPrice,$goodsNum,$goodsTotalWeight,$cityId)
+    {
+        $freight_rule = '30';//Setting::getItem('trade')['freight_rule'];
+        $expressPrice = 0.00;
+        switch ($freight_rule) {
+            case '30':    // 策略3: 以最高运费结算
+                $expressPrice =  0.00 ;
+                if ($orderTotalPrice < 28){
+                    $expressPrice = (new self())->calcTotalFee($goodsNum,$goodsTotalWeight,$cityId);
+                }
+                break;
+        }
+        return $expressPrice;
+    }
 
 }
