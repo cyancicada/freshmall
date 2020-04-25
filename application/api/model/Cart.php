@@ -97,8 +97,8 @@ class Cart
             if ($intraRegion = $goods['delivery']->checkAddress($cityId)) {
 //                $goods['express_price'] = $goods['delivery']->calcTotalFee(
 //                    $cart['goods_num'], $goods['goods_total_weight'], $cityId);
-                $goodsNum[]    = intval($cart['goods_num']);
-                $goodsWeight[] = intval($goods['goods_total_weight']);
+                if (isset($cart['goods_num'])) $goodsNum[]    = intval($cart['goods_num']);
+                if (isset($cart['goods_total_weight'])) $goodsWeight[] = intval($goods['goods_total_weight']);
             } else {
                 $goods['express_price'] = 0.00;
                 $exist_address && $this->setError("很抱歉，您的收货地址不在商品 [{$goods['goods_name']}] 的配送范围内");
@@ -108,7 +108,7 @@ class Cart
         // 商品总金额
         $orderTotalPrice = helper::getArrayColumnSum($cartList, 'total_price');
         // 所有商品的运费金额
-//        $allExpressPrice = helper::getArrayColumn($cartList, 'express_price');
+        $allExpressPrice = helper::getArrayColumn($cartList, 'express_price');
         // 订单总运费金额
 //        $expressPrice = $allExpressPrice ? Delivery::freightRule($allExpressPrice) : 0.00;
         $expressPrice = Delivery::expressRule($orderTotalPrice,array_sum($goodsNum),array_sum($goodsWeight),$cityId);
