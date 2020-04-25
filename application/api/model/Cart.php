@@ -109,7 +109,7 @@ class Cart
         $orderTotalPrice = helper::getArrayColumnSum($cartList, 'total_price');
         // 订单中蔬菜金额
         $orderVegTotalPrice = helper::getArrayColumnSum($cartList, 'veg_total_price');
-        $onlyVeg = $orderVegTotalPrice > 28 && $orderVegTotalPrice == $orderTotalPrice;
+        $onlyVeg = $orderVegTotalPrice >= 28 && $orderVegTotalPrice == $orderTotalPrice;
 
         $allExpressPrice = helper::getArrayColumn($cartList, 'express_price');
         // 订单总运费金额
