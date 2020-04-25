@@ -113,7 +113,7 @@ class Cart
 
         $allExpressPrice = helper::getArrayColumn($cartList, 'express_price');
         // 订单总运费金额
-        $expressPrice = $allExpressPrice  && $onlyVeg  ? Delivery::freightRule($allExpressPrice) : 0.00;
+        $expressPrice = $allExpressPrice  && !$onlyVeg ? Delivery::freightRule($allExpressPrice) : 0.00;
         return [
             'time_range'=>BaseModel::$timeRange,
             'goods_list' => $cartList,                       // 商品列表
