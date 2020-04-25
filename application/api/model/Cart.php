@@ -110,7 +110,7 @@ class Cart
         // 所有商品的运费金额
         $allExpressPrice = helper::getArrayColumn($cartList, 'express_price');
         // 订单总运费金额
-        $expressPrice = $allExpressPrice  && $orderTotalPrice >= 28 ? Delivery::freightRule($allExpressPrice) : 0.00;
+        $expressPrice = $allExpressPrice  && $orderTotalPrice < 28 ? Delivery::freightRule($allExpressPrice) : 0.00;
         return [
             'time_range'=>BaseModel::$timeRange,
             'goods_list' => $cartList,                       // 商品列表
