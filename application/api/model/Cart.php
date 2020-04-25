@@ -108,10 +108,10 @@ class Cart
         // 商品总金额
         $orderTotalPrice = helper::getArrayColumnSum($cartList, 'total_price');
         // 所有商品的运费金额
-        $allExpressPrice = helper::getArrayColumn($cartList, 'express_price');
+//        $allExpressPrice = helper::getArrayColumn($cartList, 'express_price');
         // 订单总运费金额
 //        $expressPrice = $allExpressPrice ? Delivery::freightRule($allExpressPrice) : 0.00;
-        $expressPrice = Delivery::expressRule($orderTotalPrice,array_sum($goodsNum),array_sum($goodsWeight),$cityId);
+        $expressPrice = 0.00;//Delivery::expressRule($orderTotalPrice,array_sum($goodsNum),array_sum($goodsWeight),$cityId);
         return [
             'time_range'=>BaseModel::$timeRange,
             'goods_list' => $cartList,                       // 商品列表
