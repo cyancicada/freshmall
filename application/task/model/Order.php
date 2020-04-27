@@ -2,6 +2,7 @@
 
 namespace app\task\model;
 
+use app\common\model\DeliveryRule;
 use app\common\model\Order as OrderModel;
 use think\Db;
 
@@ -36,11 +37,21 @@ class Order extends OrderModel
         $GoodsModel = new Goods;
         $GoodsModel->updateStockSales($this['goods']);
         // 更新订单状态
-        $this->save([
+        $data = [
             'pay_status'     => 20,
             'pay_time'       => time(),
             'transaction_id' => $transaction_id,
-        ]);
+        ];
+        // 更新订单为待收货状态
+        if (count(DeliveryRule::DELIVERY_DEFAULT) == 2) {
+            $data = array_merge($data,[
+                'express_company' => DeliveryRule::DELIVERY_DEFAULT['express_company'],
+                'express_no'      => DeliveryRule::DELIVERY_DEFAULT['express_no'],
+                'delivery_status' => 20,
+                'delivery_time'   => time(),
+            ]);
+        }
+        $this->save($data);
         Db::commit();
         return true;
     }

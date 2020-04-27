@@ -4,9 +4,7 @@ namespace app\common\library\wechat;
 
 use app\common\exception\BaseException;
 use app\common\library\sms\Driver as SmsDriver;
-use app\common\model\DeliveryRule;
 use app\common\model\Wxapp as WxappModel;
-use app\store\model\Order;
 use app\task\model\Setting as SettingModel;
 use think\Log;
 
@@ -45,26 +43,26 @@ class WxPay
         $nonceStr = md5($time . $openid);
         // API参数
         $params = [
-            'appid' => $this->config['app_id'],
-            'attach' => $this->config['app_name'],//'test',//app_name
-            'body' => $order_no,
-            'mch_id' => $this->config['mchid'],
-            'nonce_str' => $nonceStr,
-            'notify_url' => base_url() . 'notice.php',  // 异步通知地址
-            'openid' => $openid,
-            'out_trade_no' => $order_no,
+            'appid'            => $this->config['app_id'],
+            'attach'           => $this->config['app_name'],//'test',//app_name
+            'body'             => $order_no,
+            'mch_id'           => $this->config['mchid'],
+            'nonce_str'        => $nonceStr,
+            'notify_url'       => base_url() . 'notice.php',  // 异步通知地址
+            'openid'           => $openid,
+            'out_trade_no'     => $order_no,
             'spbill_create_ip' => \request()->ip(),
-            'total_fee' => $total_fee * 100, // 价格:单位分
-            'trade_type' => 'JSAPI',
+            'total_fee'        => $total_fee * 100, // 价格:单位分
+            'trade_type'       => 'JSAPI',
         ];
         // 生成签名
         $params['sign'] = $this->makeSign($params);
         // 请求API
-        $url = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
+        $url    = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
         $result = $this->postXmlCurl($this->toXml($params), $url);
         $prepay = $this->fromXml($result);
-        Log::info(var_export($prepay,true));
-        Log::info(var_export($params,true));
+        Log::info(var_export($prepay, true));
+        Log::info(var_export($params, true));
         // 请求失败
         if ($prepay['return_code'] === 'FAIL') {
             throw new BaseException(['msg' => $prepay['return_msg'], 'code' => -10]);
@@ -76,9 +74,9 @@ class WxPay
         $paySign = $this->makePaySign($params['nonce_str'], $prepay['prepay_id'], $time);
         return [
             'prepay_id' => $prepay['prepay_id'],
-            'nonceStr' => $nonceStr,
+            'nonceStr'  => $nonceStr,
             'timeStamp' => (string)$time,
-            'paySign' => $paySign
+            'paySign'   => $paySign
         ];
     }
 
@@ -143,15 +141,6 @@ class WxPay
             //$this->sendSms($order['wxapp_id'], $order['order_no']);
             //记录已经支付的id，供打印机打印
             $orderModel->findPrintOrderNoOrCreate($order['order_no']);
-            // 更新订单为待收货状态
-            if (count(DeliveryRule::DELIVERY_DEFAULT) == 2) {
-                $order->fetchSql()->save([
-                    'express_company' => DeliveryRule::DELIVERY_DEFAULT['express_company'],
-                    'express_no'      => DeliveryRule::DELIVERY_DEFAULT['express_no'],
-                    'delivery_status' => 20,
-                    'delivery_time'   => time(),
-                ]);
-            }
             // 返回状态
             $this->returnCode(true, 'OK');
         }
@@ -169,7 +158,7 @@ class WxPay
     private function sendSms($wxapp_id, $order_no)
     {
         // 短信配置信息
-        $config = SettingModel::getItem('sms', $wxapp_id);
+        $config    = SettingModel::getItem('sms', $wxapp_id);
         $SmsDriver = new SmsDriver($config);
         return $SmsDriver->sendSms('order_pay', compact('order_no'));
     }
@@ -183,7 +172,7 @@ class WxPay
     {
         $xml_post = $this->toXml([
             'return_code' => $is_success ? $msg ?: 'SUCCESS' : 'FAIL',
-            'return_msg' => $is_success ? 'OK' : $msg,
+            'return_msg'  => $is_success ? 'OK' : $msg,
         ]);
         die($xml_post);
     }
@@ -208,10 +197,10 @@ class WxPay
     private function makePaySign($nonceStr, $prepay_id, $timeStamp)
     {
         $data = [
-            'appId' => $this->config['app_id'],
-            'nonceStr' => $nonceStr,
-            'package' => 'prepay_id=' . $prepay_id,
-            'signType' => 'MD5',
+            'appId'     => $this->config['app_id'],
+            'nonceStr'  => $nonceStr,
+            'package'   => 'prepay_id=' . $prepay_id,
+            'signType'  => 'MD5',
             'timeStamp' => $timeStamp,
         ];
 
