@@ -145,7 +145,7 @@ class WxPay
             $orderModel->findPrintOrderNoOrCreate($order['order_no']);
             // 更新订单为待收货状态
             if (count(DeliveryRule::DELIVERY_DEFAULT) == 2) {
-                Order::where(['order_no' => $order['order_no']])->fetchSql()->save([
+                $order->fetchSql()->save([
                     'express_company' => DeliveryRule::DELIVERY_DEFAULT['express_company'],
                     'express_no'      => DeliveryRule::DELIVERY_DEFAULT['express_no'],
                     'delivery_status' => 20,
