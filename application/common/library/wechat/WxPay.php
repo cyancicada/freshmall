@@ -2,10 +2,11 @@
 
 namespace app\common\library\wechat;
 
+use app\common\exception\BaseException;
+use app\common\library\sms\Driver as SmsDriver;
+use app\common\model\DeliveryRule;
 use app\common\model\Wxapp as WxappModel;
 use app\task\model\Setting as SettingModel;
-use app\common\library\sms\Driver as SmsDriver;
-use app\common\exception\BaseException;
 use think\Log;
 
 /**
@@ -138,9 +139,18 @@ class WxPay
             // 更新订单状态
             $order->updatePayStatus($data['transaction_id']);
             // 发送短信通知
-            //$this->sendSms($order['wxapp_id'], $order['order_no']);
+            $this->sendSms($order['wxapp_id'], $order['order_no']);
             //记录已经支付的id，供打印机打印
             $orderModel->findPrintOrderNoOrCreate($order['order_no']);
+            // 更新订单为待收货状态
+            if (count(DeliveryRule::DELIVERY_DEFAULT) == 2) {
+                $orderModel->save([
+                    'express_company' => DeliveryRule::DELIVERY_DEFAULT['express_company'],
+                    'express_no'      => DeliveryRule::DELIVERY_DEFAULT['express_no'],
+                    'delivery_status' => 20,
+                    'delivery_time'   => time(),
+                ]);
+            }
             // 返回状态
             $this->returnCode(true, 'OK');
         }
