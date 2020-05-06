@@ -138,7 +138,7 @@ class WxPay
             // 更新订单状态
             $order->updatePayStatus($data['transaction_id']);
             // 发送短信通知
-            //$this->sendSms($order['wxapp_id'], $order['order_no']);
+            $this->sendSms($order['wxapp_id'], $order['order_no']);
             //记录已经支付的id，供打印机打印
             $orderModel->findPrintOrderNoOrCreate($order['order_no']);
             // 返回状态
