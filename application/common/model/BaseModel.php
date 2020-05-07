@@ -46,7 +46,7 @@ class BaseModel extends Model
                 $key = $index;
             }
         }
-        return [1,$key];
+        return [0,$key];
     }
     /**
      * 模型基类初始化
