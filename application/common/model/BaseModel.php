@@ -36,17 +36,20 @@ class BaseModel extends Model
         ]
     ];
 
-    public static function calTimeRange(){
-        $d = intval(date('H'));
-        $d += $d == 11 ? 3 : 2;
-        $key = 0;
-        foreach (self::$timeRange[1] as  $index => $value) {
+    public static function calTimeRange()
+    {
+        $d   = intval(date('H'));
+        $d   += $d == 11 ? 3 : 2;
+        $key = - 1;
+        foreach (self::$timeRange[1] as $index => $value) {
             $tmp = explode('~', $value);
             if ($d >= intval($tmp[0]) && $d < intval($tmp[1])) {
                 $key = $index;
             }
         }
-        return [0,$key];
+        $dayKey   = $key < 0 ? 1 : 0;
+        $rangeKey = $key < 0 ? 0 : $key;
+        return [$dayKey, $rangeKey];
     }
     /**
      * 模型基类初始化
