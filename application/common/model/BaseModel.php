@@ -35,6 +35,19 @@ class BaseModel extends Model
             '18:00~20:00',
         ]
     ];
+
+    public static function calTimeRange(){
+        $d = intval(date('H'));
+        $d += $d == 11 ? 3 : 2;
+        $key = 0;
+        foreach (self::$timeRange[1] as  $index => $value) {
+            $tmp = explode('~', $value);
+            if ($d >= intval($tmp[0]) && $d < intval($tmp[1])) {
+                $key = $index;
+            }
+        }
+        return $key;
+    }
     /**
      * 模型基类初始化
      */
