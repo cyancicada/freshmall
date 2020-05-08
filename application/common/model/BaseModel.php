@@ -26,10 +26,8 @@ class BaseModel extends Model
         [
             '今天',
             '明天',
-            '后天'
         ],
         [
-            '06:00~07:00',
             '07:00~09:00',
             '09:00~11:00',
             '14:00~16:00',
@@ -37,6 +35,27 @@ class BaseModel extends Model
             '18:00~20:00',
         ]
     ];
+
+    public static function calTimeRange()
+    {
+        $key = - 1;
+        $d   = intval(date('H')) + 2;
+
+        if ($d >= 11 && $d <= 14) $d = 14;
+
+        foreach (self::$timeRange[1] as $index => $value) {
+
+            $tmp = explode('~', str_replace(':00','',$value));
+            if ($d >= intval($tmp[0]) && $d < intval($tmp[1])) {
+                $key = $index;
+                break;
+            }
+        }
+        return [
+            $key == -1 ? 1 : 0,
+            $key == -1 ? 0 : $key,
+        ];
+    }
     /**
      * 模型基类初始化
      */

@@ -149,11 +149,13 @@
                             <tr>
                                 <th>收货人</th>
                                 <th>收货电话</th>
+                                <th>配送时间</th>
                                 <th>收货地址</th>
                             </tr>
                             <tr>
                                 <td><?= $detail['address']['name'] ?></td>
                                 <td><?= $detail['address']['phone'] ?></td>
+                                <td><?= $detail['claim_delivery_time'] ?> <?= $detail['claim_time_range'] ?></td>
                                 <td>
                                     <?= $detail['address']['region']['province'] ?>
                                     <?= $detail['address']['region']['city'] ?>

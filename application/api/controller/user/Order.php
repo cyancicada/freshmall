@@ -53,7 +53,7 @@ class Order extends Controller
     public function detail($order_id)
     {
         $order = OrderModel::getUserOrderDetail($order_id, $this->user['user_id']);
-        return $this->renderSuccess(['order' => $order,'time_range'=>OrderModel::$timeRange]);
+        return $this->renderSuccess(['order' => $order,'time_range'=>OrderModel::$timeRange,'multiIndex'=>OrderModel::calTimeRange(),]);
     }
 
     /**

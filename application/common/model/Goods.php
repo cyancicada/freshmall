@@ -167,7 +167,7 @@ class Goods extends BaseModel
             ->where('is_delete', '=', 0)
             ->where($filter)
             ->order($sort)
-            ->paginate(10, false, [
+            ->paginate(100, false, [
                 'query' => Request::instance()->request()
             ]);
         return $list;

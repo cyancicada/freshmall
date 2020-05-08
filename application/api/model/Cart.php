@@ -116,6 +116,7 @@ class Cart
         $expressPrice = $allExpressPrice  && !$onlyVeg ? Delivery::freightRule($allExpressPrice) : 0.00;
         return [
             'time_range'=>BaseModel::$timeRange,
+            'multiIndex'=>BaseModel::calTimeRange(),
             'goods_list' => $cartList,                       // 商品列表
             'order_total_num' => $this->getTotalNum(),       // 商品总数量
             'order_total_price' => helper::number2($orderTotalPrice),              // 商品总金额 (不含运费)

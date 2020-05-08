@@ -76,6 +76,7 @@ class Order extends OrderModel
             'has_error' => $this->hasError(),
             'error_msg' => $this->getError(),
             'time_range'=>self::$timeRange,
+            'multiIndex'=>self::calTimeRange(),
         ];
     }
 

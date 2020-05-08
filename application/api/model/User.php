@@ -7,6 +7,7 @@ use app\common\model\User as UserModel;
 use app\common\library\wechat\WxUser;
 use app\common\exception\BaseException;
 use think\Cache;
+use think\Log;
 use think\Request;
 
 /**
@@ -51,6 +52,7 @@ class User extends UserModel
     {
         // 微信登录 获取session_key
         $session = $this->wxlogin($post['code']);
+        Log::info(var_export($session,true));
         // 自动注册用户
         $userInfo = json_decode(htmlspecialchars_decode($post['user_info']), true);
         $user_id = $this->register($session['openid'], $userInfo);
