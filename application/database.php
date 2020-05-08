@@ -12,7 +12,7 @@ $config = [
 ];
 
 return [
-    // 数据库类型
+    // 数据库类型 1
     'type' => 'mysql',
     // 服务器地址
     'hostname' => $config['host'],
