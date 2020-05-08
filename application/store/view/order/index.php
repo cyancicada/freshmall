@@ -5,6 +5,16 @@
                 <div class="widget-head am-cf">
                     <div class="widget-title am-cf"><?= $title ?></div>
                 </div>
+                <div>
+                    <form class="widget-title am-cf" action="index.php" method="get">
+                        <input type="hidden" value="<?= request()->path() ?>" name="s">
+                        <label for="order_sn">订单号：<input type="text" value="<?= request()->get('order_no') ?>" id="order_no" class="tpl-form-input" name="order_no"/></label>
+                        <label for="username">用户名：<input type="text" value="<?= request()->get('username') ?>" id="username" class="tpl-form-input" name="username"/></label>
+                        <button type="submit"  style="padding:3px;" class="j-submit am-btn am-btn-sm am-btn-secondary">
+                            搜索
+                        </button>
+                    </form>
+                </div>
                 <div class="widget-body am-fr">
                     <div class="order-list am-scrollable-horizontal am-u-sm-12 am-margin-top-xs">
                         <table width="100%" class="am-table am-table-centered

@@ -4,6 +4,7 @@ namespace app\store\controller;
 
 use app\store\model\Order as OrderModel;
 use think\cache\driver\Redis;
+use app\store\model\User;
 
 /**
  * 订单管理
@@ -79,6 +80,29 @@ class Order extends Controller
         return $this->getList('全部订单列表');
     }
 
+
+    /** 构建订单查询条件
+     * @param array $filter
+     * @throws \think\exception\DbException
+     * @return array
+     */
+    public function buildFilter($filter = [])
+    {
+        $request  = request();
+        $orderSn  = $request->get('order_no');
+        $username = $request->get('username');
+        if (!empty($orderSn)) {
+            $filter['order_no'] = ['like', '%' . $orderSn . '%'];
+        }
+        if (!empty($username)) {
+            $uw['nickName'] = ['like', '%' . $username . '%'];
+            $user           = (new User())->where([
+                'nickName' => ['like', '%' . $username . '%'],
+            ])->field('user_id')->select()->toArray();
+            if (!empty($user)) $filter['user_id'] = ['in', array_column($user, 'user_id')];
+        }
+        return $filter;
+    }
     /**
      * 订单列表
      * @param $title
@@ -88,8 +112,9 @@ class Order extends Controller
      */
     private function getList($title, $filter = [])
     {
-        $model = new OrderModel;
-        $list  = $model->getList($filter);
+        $filter = $this->buildFilter($filter);
+        $model  = new OrderModel;
+        $list   = $model->getList($filter);
         return $this->fetch('index', compact('title', 'list'));
     }
 
