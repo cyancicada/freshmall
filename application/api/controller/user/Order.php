@@ -122,7 +122,7 @@ class Order extends Controller
         $order = OrderModel::detail($order_id);
         if (empty($order)) return $this->renderError($order->getError());
 
-        $order = OrderModel::updateClaimDeliveryTime($order_id,$claim_delivery_time);
+        OrderModel::updateClaimDeliveryTime($order_id,$claim_delivery_time);
         if ($order->hasError()) return $this->renderError($order->getError());
 
         return $this->renderSuccess();

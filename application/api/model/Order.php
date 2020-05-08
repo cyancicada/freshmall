@@ -358,17 +358,16 @@ class Order extends OrderModel
     /** 更新用户配送时间
      * @param $order_id
      * @param $claim_delivery_time
-     * @return Order
+     * @return void
      */
     public static function updateClaimDeliveryTime($order_id, $claim_delivery_time)
     {
-        $day = '';
-        $timeRange = '';
         if (!empty($claim_delivery_time)) {
             list($day, $timeRange) = self::captureTime($claim_delivery_time);
+            self::update(['claim_delivery_time' => $day, 'claim_time_range' => $timeRange], ['order_id' => $order_id]);
+            return;
         }
-
-        return self::update(['claim_delivery_time' => $day,'claim_time_range'=>$timeRange], ['order_id' => $order_id]);
+        return;
     }
 
     /**
