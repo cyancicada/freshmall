@@ -28,6 +28,7 @@
                                     <td class="am-text-middle am-text-left" colspan="6">
                                         <span class="am-margin-right-lg"> <?= $order['create_time'] ?></span>
                                         <span class="am-margin-right-lg">订单号：<?= $order['order_no'] ?></span>
+                                        <span class="am-margin-right-lg">配送时间：<?= $order['claim_delivery_time'] ?> <?= $order['claim_time_range'] ?></span>
                                     </td>
                                 </tr>
                                 <?php $i = 0;
