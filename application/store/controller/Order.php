@@ -89,8 +89,8 @@ class Order extends Controller
     public function buildFilter($filter = [])
     {
         $request  = request();
-        $orderSn  = $request->get('order_no');
-        $username = $request->get('username');
+        $orderSn  = trim($request->get('order_no'));
+        $username = trim($request->get('username'));
         if (!empty($orderSn)) {
             $filter['order_no'] = ['like', '%' . $orderSn . '%'];
         }
