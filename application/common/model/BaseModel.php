@@ -38,18 +38,23 @@ class BaseModel extends Model
 
     public static function calTimeRange()
     {
-        $d   = intval(date('H'));
-        $d   += $d == 11 ? 3 : 2;
         $key = - 1;
+        $d   = intval(date('H')) + 2;
+
+        if ($d >= 11 && $d <= 14) $d = 14;
+
         foreach (self::$timeRange[1] as $index => $value) {
-            $tmp = explode('~', $value);
+
+            $tmp = explode('~', str_replace(':00','',$value));
             if ($d >= intval($tmp[0]) && $d < intval($tmp[1])) {
                 $key = $index;
+                break;
             }
         }
-        $dayKey   = $key < 0 ? 1 : 0;
-        $rangeKey = $key < 0 ? 0 : $key;
-        return [$dayKey, $rangeKey];
+        return [
+            $key == -1 ? 1 : 0,
+            $key == -1 ? 0 : $key,
+        ];
     }
     /**
      * 模型基类初始化
