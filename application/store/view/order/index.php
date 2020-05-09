@@ -5,11 +5,11 @@
                 <div class="widget-head am-cf">
                     <div class="widget-title am-cf"><?= $title ?></div>
                 </div>
-                <div>
-                    <form class="widget-title am-cf" action="index.php" method="get">
+                <div class="widget-body am-fr">
+                    <form style="padding: 0 10px;" action="index.php" method="get">
                         <input type="hidden" value="<?= request()->path() ?>" name="s">
-                        <label for="order_sn">订单号：<input type="text" value="<?= request()->get('order_no') ?>" id="order_no" class="tpl-form-input" name="order_no"/></label>
-                        <label for="username">用户名：<input type="text" value="<?= request()->get('username') ?>" id="username" class="tpl-form-input" name="username"/></label>
+                        <label for="order_no">订单号：<input style="width: 100px;" type="text" value="<?= request()->get('order_no') ?>" id="order_no" class="tpl-form-input" name="order_no"/></label>
+                        <label for="username">用户名：<input style="width: 100px;" type="text" value="<?= request()->get('username') ?>" id="username" class="tpl-form-input" name="username"/></label>
                         <button type="submit"  style="padding:3px;" class="j-submit am-btn am-btn-sm am-btn-secondary">
                             搜索
                         </button>

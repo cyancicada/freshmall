@@ -20,8 +20,15 @@ class Goods extends Controller
      */
     public function index()
     {
+        $request = request();
         $model = new GoodsModel;
-        $list = $model->getList();
+        $list = $model->getList(
+            null,
+            0,
+            $request->get('goods_name'),
+            $request->get('sort','all'),
+            true
+            );
         return $this->fetch('index', compact('list'));
     }
 

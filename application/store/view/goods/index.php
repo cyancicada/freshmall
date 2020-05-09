@@ -6,6 +6,23 @@
                     <div class="widget-title am-cf">出售中的商品</div>
                 </div>
                 <div class="widget-body am-fr">
+                    <form style="padding: 0 10px;" action="index.php" method="get">
+                        <input type="hidden" value="<?= request()->path() ?>" name="s">
+                        <label for="goods_name">商品名：
+                            <input type="text" style="width: 100px;" value="<?= request()->get('goods_name') ?>" id="goods_name" class="tpl-form-input" name="goods_name"/></label>
+                        <label for="sort">排序：
+                        <select name="sort">
+                            <option value="all" <?= request()->get('sort')=='all' ? 'selected' :''; ?>>默认</option>
+                            <option value="sales" <?= request()->get('sort')=='sales' ? 'selected' :''; ?>>销量高到低</option>
+                            <option value="price" <?= request()->get('sort')=='price' ? 'selected' :''; ?>>价格高到低</option>
+                        </select>
+                        </label>
+                        <button type="submit"  style="padding:3px;" class="j-submit am-btn am-btn-sm am-btn-secondary">
+                            搜索
+                        </button>
+                    </form>
+                </div>
+                <div class="widget-body am-fr">
                     <div class="am-u-sm-12 am-u-md-6 am-u-lg-6">
                         <div class="am-form-group">
                             <div class="am-btn-toolbar">
