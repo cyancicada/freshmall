@@ -10,6 +10,18 @@
                         <input type="hidden" value="<?= request()->path() ?>" name="s">
                         <label for="order_no">订单号：<input style="width: 100px;" type="text" value="<?= request()->get('order_no') ?>" id="order_no" class="tpl-form-input" name="order_no"/></label>
                         <label for="username">用户名：<input style="width: 100px;" type="text" value="<?= request()->get('username') ?>" id="username" class="tpl-form-input" name="username"/></label>
+
+                        <label for="claim_time">配送时间：
+                            <input style="width: 200px;" readonly type="text" value="<?= request()->get('claim_time') ?>"
+                                   class="layui-input date_range_seletor" autocomplete="off"
+                                   name="claim_time"/>
+                            <select name="claim_range">
+                                <option value="">全部</option>
+                                <?php  foreach ($range[1] as $item):?>
+                                <option <?= request()->get('claim_range') == $item ? 'selected' :''; ?> value="<?= $item ?>"><?= $item ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </label>
                         <button type="submit"  style="padding:3px;" class="j-submit am-btn am-btn-sm am-btn-secondary">
                             搜索
                         </button>
@@ -121,4 +133,5 @@
         </div>
     </div>
 </div>
+
 

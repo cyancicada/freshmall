@@ -2,6 +2,7 @@
 
 namespace app\store\controller;
 
+use app\common\model\BaseModel;
 use app\store\model\Order as OrderModel;
 use think\cache\driver\Redis;
 use app\store\model\User;
@@ -88,12 +89,19 @@ class Order extends Controller
      */
     public function buildFilter($filter = [])
     {
-        $request  = request();
-        $orderSn  = trim($request->get('order_no'));
-        $username = trim($request->get('username'));
-        if (!empty($orderSn)) {
-            $filter['order_no'] = ['like', '%' . $orderSn . '%'];
+        $request   = request();
+        $orderSn   = trim($request->get('order_no'));
+        $username  = trim($request->get('username'));
+        $claimTime = trim($request->get('claim_time'));
+        $range     = trim($request->get('claim_range'));
+        if (!empty($orderSn)) $filter['order_no'] = ['like', '%' . $orderSn . '%'];
+
+        if (!empty($claimTime)) {
+            list($start, $end) = explode(' - ', $claimTime);
+            $filter['claim_delivery_time'] = ['between',[trim($start),trim($end)]];
         }
+        if (!empty($range)) $filter['claim_time_range'] = $range;
+
         if (!empty($username)) {
             $uw['nickName'] = ['like', '%' . $username . '%'];
             $user           = (new User())->where([
@@ -118,7 +126,9 @@ class Order extends Controller
         $filter = $this->buildFilter($filter);
         $model  = new OrderModel;
         $list   = $model->getList($filter);
-        return $this->fetch('index', compact('title', 'list'));
+
+        $range = BaseModel::$timeRange;
+        return $this->fetch('index', compact('title', 'list','range'));
     }
 
     /**

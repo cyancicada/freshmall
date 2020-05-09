@@ -122,6 +122,7 @@
 
 </div>
 <script src="assets/layer/layer.js"></script>
+<script src="assets/layer/laydate/laydate.js"></script>
 <script src="assets/store/js/jquery.form.min.js"></script>
 <script src="assets/store/js/amazeui.min.js"></script>
 <script src="assets/store/js/webuploader.html5only.js"></script>
@@ -129,5 +130,16 @@
 <script src="assets/store/js/app.js"></script>
 <script src="assets/store/js/file.library.js"></script>
 </body>
+<script>
+    //常规用法
+    laydate.render({
+        elem: '#date_seletor'
+    });
+    //常规用法
+    laydate.render({
+        elem: '.date_range_seletor',
+        range: true
+    });
+</script>
 
 </html>
