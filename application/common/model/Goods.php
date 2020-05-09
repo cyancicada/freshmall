@@ -214,6 +214,7 @@ class Goods extends BaseModel
             ->where('is_delete', '=', 0)
             ->where('goods_status', '=', 10)
             ->order(['goods_id' => 'desc', 'goods_sort' => 'asc'])
+            ->limit(10)
             ->select();
     }
 
