@@ -26,7 +26,7 @@ class Index extends Controller
         $model = new GoodsModel;
         $newest = $model->getNewList();
         // 猜您喜欢
-        $best = $model->getBestList();
+        $best = $newest;//$model->getBestList();
         return $this->renderSuccess(compact('items', 'newest', 'best'));
     }
 
