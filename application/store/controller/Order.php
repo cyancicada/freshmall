@@ -99,7 +99,10 @@ class Order extends Controller
             $user           = (new User())->where([
                 'nickName' => ['like', '%' . $username . '%'],
             ])->field('user_id')->select()->toArray();
-            if (!empty($user)) $filter['user_id'] = ['in', array_column($user, 'user_id')];
+            $uidList        = array_column($user, 'user_id');
+            if (empty($uidList)) $uidList[] = '0';
+
+            $filter['user_id'] = ['in', array_column($user, 'user_id')];
         }
         return $filter;
     }
