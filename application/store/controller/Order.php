@@ -97,7 +97,7 @@ class Order extends Controller
         if (!empty($orderSn)) $filter['order_no'] = ['like', '%' . $orderSn . '%'];
 
         if (!empty($claimTime)) {
-            list($start, $end) = explode(' - ', $claimTime);
+            list($start, $end) = explode('~', $claimTime);
             $filter['claim_delivery_time'] = ['between',[trim($start),trim($end)]];
         }
         if (!empty($range)) $filter['claim_time_range'] = $range;

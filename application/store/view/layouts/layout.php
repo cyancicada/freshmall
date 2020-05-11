@@ -138,7 +138,7 @@
     //常规用法
     laydate.render({
         elem: '.date_range_seletor',
-        range: true
+        range: '~'
     });
 </script>
 
