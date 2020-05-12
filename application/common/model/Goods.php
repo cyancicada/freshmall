@@ -263,8 +263,8 @@ class Goods extends BaseModel
             return [$goodsId];
         }
         if ($redis->handler()->exists($k)) {
-            Log::info($k);
-            return $redis->handler()->zRevRangeByScore($k,0,time());
+            Log::info(var_export($redis->handler()->zRevRangeByScore($k,0,time(),['withscores' => true, 'limit' => [1, 10]]),true));
+            return $redis->handler()->zRevRangeByScore($k,0,time(),['withscores' => true, 'limit' => [1, 10]]);
         }
         return [];
     }
