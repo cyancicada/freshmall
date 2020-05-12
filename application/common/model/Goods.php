@@ -194,13 +194,13 @@ class Goods extends BaseModel
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getBestList()
+    public function getBestList($fileter)
     {
         return $this->with(['spec', 'category', 'image.file'])
+            ->where($fileter)
             ->where('is_delete', '=', 0)
             ->where('goods_status', '=', 10)
             ->order(['sales_initial' => 'desc', 'goods_sort' => 'asc'])
-            ->limit(10)
             ->select();
     }
 
@@ -263,8 +263,8 @@ class Goods extends BaseModel
             return [$goodsId];
         }
         if ($redis->handler()->exists($k)) {
-            Log::info(var_export($redis->handler()->zRevRangeByScore($k,time(),0,['withscores' => true, 'limit' => [1, 10]]),true));
-            return $redis->handler()->zRevRangeByScore($k,0,time(),['withscores' => true, 'limit' => [1, 10]]);
+            $res =  $redis->handler()->zRevRangeByScore($k,time(),0,['withscores' => true, 'limit' => [1, 10]]);
+            return array_keys($res);
         }
         return [];
     }

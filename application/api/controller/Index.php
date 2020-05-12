@@ -29,9 +29,8 @@ class Index extends Controller
         // 猜您喜欢
         try{
             $user = $this->getUser();
-            $goodsId = $model->historyGoodsUserView($user['user_id']);
-            Log::info(var_export($goodsId,true));
-            $best = $newest;
+            $goodsIdList = $model->historyGoodsUserView($user['user_id']);
+            $best = $model->getBestList(['goods_id'=>['in',$goodsIdList]]);
         }catch (\Exception $exception){
             $best = $newest;//$model->getBestList();
         }
