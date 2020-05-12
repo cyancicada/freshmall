@@ -34,7 +34,7 @@ class Goods extends Controller
      * 获取商品详情
      * @param $goods_id
      * @return array
-     * @throws \think\exception\DbException
+     * @throws \Exception
      */
     public function detail($goods_id)
     {
@@ -45,9 +45,10 @@ class Goods extends Controller
         }
         // 规格信息
         $specData = $detail['spec_type'] == 20 ? $detail->getManySpecData($detail['spec_rel'], $detail['spec']) : null;
-//        $user = $this->getUser();
+        $user = $this->getUser();
 //        // 购物车商品总数量
 //        $cart_total_num = (new CartModel($user['user_id']))->getTotalNum();
+        (new GoodsModel())->historyGoodsUserView($user['user_id'],$goods_id);
         return $this->renderSuccess(compact('detail', /*'cart_total_num',*/ 'specData'));
     }
 

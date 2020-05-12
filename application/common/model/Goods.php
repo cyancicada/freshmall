@@ -2,6 +2,7 @@
 
 namespace app\common\model;
 
+use think\cache\driver\Redis;
 use think\Request;
 
 /**
@@ -13,6 +14,7 @@ class Goods extends BaseModel
 {
     protected $name = 'goods';
     protected $append = ['goods_sales'];
+    const HISTORY_VIEW='user:goods:%s';
 
     /**
      * 计算显示销量 (初始销量 + 实际销量)
@@ -241,6 +243,28 @@ class Goods extends BaseModel
             }
         }
         return $goods_sku;
+    }
+
+
+    /**
+     *记录用记浏览记录
+     * @param $userId
+     * @param string $goodsId
+     * @return array
+     * @author kyang
+     */
+    public function historyGoodsUserView($userId, $goodsId = '')
+    {
+        $redis = new Redis();
+        $k     = sprintf(self::HISTORY_VIEW, $userId);
+        if (!empty($goodsId)) {
+            $redis->handler()->zAdd($k, time(),$goodsId);
+            return [$goodsId];
+        }
+        if ($redis->handler()->exists($k)) {
+            return $redis->handler()->zRevRangeByScore($k,0,time());
+        }
+        return [];
     }
 
 }

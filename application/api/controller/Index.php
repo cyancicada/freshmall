@@ -4,6 +4,7 @@ namespace app\api\controller;
 
 use app\api\model\WxappPage;
 use app\api\model\Goods as GoodsModel;
+use think\Log;
 
 /**
  * 首页控制器
@@ -26,7 +27,14 @@ class Index extends Controller
         $model = new GoodsModel;
         $newest = $model->getNewList();
         // 猜您喜欢
-        $best = $newest;//$model->getBestList();
+        try{
+            $user = $this->getUser();
+            $goodsId = $model->historyGoodsUserView($user['user_id']);
+            Log::info(var_export($goodsId,true));
+            $best = $newest;
+        }catch (\Exception $exception){
+            $best = $newest;//$model->getBestList();
+        }
         return $this->renderSuccess(compact('items', 'newest', 'best'));
     }
 
