@@ -4,7 +4,6 @@ namespace app\api\controller;
 
 use app\api\model\WxappPage;
 use app\api\model\Goods as GoodsModel;
-use think\Log;
 
 /**
  * 首页控制器
