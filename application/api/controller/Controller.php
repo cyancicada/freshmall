@@ -5,7 +5,6 @@ namespace app\api\controller;
 use app\api\model\User as UserModel;
 use app\common\exception\BaseException;
 use think\Controller as ThinkController;
-use think\Log;
 
 /**
  * API控制器基类
@@ -54,8 +53,6 @@ class Controller extends ThinkController
         if (!$token = $this->request->param('token')) {
             throw new BaseException(['code' => -1, 'msg' => '缺少必要的参数：token']);
         }
-        Log::info($this->request->param('token'));
-
         if (!$user = UserModel::getUser($token)) {
             throw new BaseException(['code' => -1, 'msg' => '没有找到用户信息']);
         }

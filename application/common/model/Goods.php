@@ -3,6 +3,7 @@
 namespace app\common\model;
 
 use think\cache\driver\Redis;
+use think\Log;
 use think\Request;
 
 /**
@@ -262,6 +263,7 @@ class Goods extends BaseModel
             return [$goodsId];
         }
         if ($redis->handler()->exists($k)) {
+            Log::info($k);
             return $redis->handler()->zRevRangeByScore($k,0,time());
         }
         return [];
