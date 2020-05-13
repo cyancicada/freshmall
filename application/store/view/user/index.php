@@ -6,6 +6,12 @@
                     <div class="widget-title am-cf">用户列表</div>
                 </div>
                 <div class="widget-body am-fr">
+                    <form style="padding: 0 10px;" action="index.php" method="get">
+                        <input type="hidden" value="<?= request()->path() ?>" name="s">
+                        <label for="username">用户名：<input style="width: 100px;" type="text" value="<?= request()->get('username') ?>" id="username" class="tpl-form-input" name="username"/></label>
+                    </form>
+                </div>
+                <div class="widget-body am-fr">
                     <div class="am-scrollable-horizontal am-u-sm-12">
                         <table width="100%" class="am-table am-table-compact am-table-striped
                          tpl-table-black am-text-nowrap">

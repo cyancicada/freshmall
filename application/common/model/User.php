@@ -49,10 +49,10 @@ class User extends BaseModel
      * @return \think\Paginator
      * @throws \think\exception\DbException
      */
-    public function getList()
+    public function getList($filter=[])
     {
         $request = Request::instance();
-        return $this->order(['create_time' => 'desc'])
+        return $this->order(['create_time' => 'desc'])->where($filter)
             ->paginate(15, false, ['query' => $request->request()]);
     }
 
