@@ -33,6 +33,7 @@ class Index extends Controller
         }catch (\Exception $exception){
             $best = $newest;//$model->getBestList();
         }
+        if (empty($best)) $best = $newest;
         return $this->renderSuccess(compact('items', 'newest', 'best'));
     }
 
