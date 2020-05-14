@@ -200,7 +200,6 @@ class Goods extends BaseModel
             ->where($fileter)
             ->where('is_delete', '=', 0)
             ->where('goods_status', '=', 10)
-            ->order(['sales_initial' => 'desc', 'goods_sort' => 'asc'])
             ->select();
     }
 
