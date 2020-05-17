@@ -13,7 +13,6 @@ use think\Log;
  */
 class Balance extends BaseModel
 {
-    protected $autoWriteTimestamp = false;
     protected $name = 'balance';
 
     const TYPE_ADD      = 'ADD';
