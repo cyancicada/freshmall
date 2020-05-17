@@ -11,5 +11,6 @@ use think\Cache;
  */
 class BalanceDetail extends BaseModel
 {
+    protected $autoWriteTimestamp = false;
     protected $name = 'balance_detail';
 }
