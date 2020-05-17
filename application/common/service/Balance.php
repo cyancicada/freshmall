@@ -120,12 +120,11 @@ class Balance
             $filter = ['user_id' => $user_id, 'trade_status' => 'FINISHED'];
             $res    = (new BalanceDetail)->where($filter)->order(['create_time' => 'desc'])->select();
             $data   = [];
+
             if (!empty($res)) $data = $res->toArray();
-            dd($data);
+          dd($res);
             foreach ($data as &$item) {
                 $item['type_name']   = isset(BalanceModel::$typeMap[$item['type']]) ? BalanceModel::$typeMap[$item['type']] : '其它';
-                $item['create_time'] = date('Y-m-d H:i:s', $item['create_time']);
-                $item['update_time'] = date('Y-m-d H:i:s', $item['update_time']);
             }
             return $data;
         } catch (\Exception $exception) {
