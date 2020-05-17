@@ -116,7 +116,8 @@ class Balance
     public function myBill($user_id)
     {
         try {
-            return BalanceDetail::get(['user_id' => $user_id]);
+            $filter = ['user_id' => $user_id];
+            return (new BalanceDetail)->where($filter)->order(['create_time','desc'])->select();
         } catch (\Exception $exception) {
             throw new \Exception('获取余额账单失败');
         }
