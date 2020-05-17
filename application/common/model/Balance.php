@@ -4,6 +4,7 @@ namespace app\common\model;
 
 use think\Cache;
 use think\Db;
+use think\Log;
 
 /**
  * 商品分类模型
@@ -47,6 +48,7 @@ class Balance extends BaseModel
             Db::commit();
         } catch (\Exception $exception) {
             Db::rollback();
+            Log::info($exception->getMessage());
             $this->error = '充值失败';
         }
         return false;
