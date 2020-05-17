@@ -20,7 +20,7 @@ class Balance
      * @return array
      * @throws \Exception
      */
-    public function balanceOperate($user_id, $open_id, $balance, $type = BalanceModel::TYPE_RECHARGE)
+    public function balanceOperate($user_id, $open_id, $balance, $type = BalanceModel::TYPE_RECHARGE, $mark = '')
     {
         if (empty($balance)) throw new \Exception('充值金额错误');
 
@@ -34,7 +34,8 @@ class Balance
                 'wxapp_id' => $balanceModel::$wxapp_id,
                 'balance'  => $balance,
                 'trade_no' => $tradeNo,
-                'mark'     => $type,
+                'type'     => $type,
+                'mark'     => $mark,
             ]);
             if ($type == BalanceModel::TYPE_RECHARGE) {
                 $wxConfig = WxappModel::getWxappCache();
@@ -116,8 +117,13 @@ class Balance
     public function myBill($user_id)
     {
         try {
-            $filter = ['user_id' => $user_id];
-            return (new BalanceDetail)->where($filter)->order(['create_time'=>'desc'])->select();
+            $filter = ['user_id' => $user_id, 'trade_status' => 'FINISHED'];
+            $data   = (new BalanceDetail)->where($filter)->order(['create_time' => 'desc'])->select();
+
+            foreach ($data as &$item) {
+                $item['type_name'] = isset(BalanceModel::$typeMap[$item['type_name']]) ? BalanceModel::$typeMap[$item['type_name']] : '其它';
+            }
+            return $data;
         } catch (\Exception $exception) {
             throw new \Exception('获取余额账单失败');
         }
