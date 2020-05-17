@@ -60,5 +60,16 @@ class Balance extends Controller
             return $this->renderError($exception->getCode() == 1 ? $exception->getMessage() :'操作异常');
         }
     }
+    /**
+     * 我的余额
+     */
+    public function bill(){
+        try{// 发起微信支付
+            $bill      = (new BalanceService)->myBill($this->user['user_id']);
+            return $this->renderSuccess($bill);
+        }catch (\Exception $exception){
+            return $this->renderError($exception->getCode() == 1 ? $exception->getMessage() :'操作异常');
+        }
+    }
 
 }
