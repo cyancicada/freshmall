@@ -29,28 +29,17 @@ class Balance
         $type         = $balance > 0 ? BalanceModel::TYPE_ADD : BalanceModel::TYPE_CONSUMER;
         try {
             Db::startTrans();
-            $id = $balanceModel->where('user_id', $user_id)->value('id');
-            if (!empty($id)) {
-                if ($type == BalanceModel::TYPE_ADD) $balanceModel->inc('balance', $balance);
-                if ($type == BalanceModel::TYPE_CONSUMER) $balanceModel->dec('balance', $balance);
-            } else {
-                $balanceModel->save([
-                    'user_id'  => $user_id,
-                    'wxapp_id' => $balanceModel::$wxapp_id,
-                    'balance'  => $balance,
-                ]);
-            }
+            $tradeNo = self::buildTradeNo($user_id);
             (new BalanceDetail)->save([
                 'user_id'  => $user_id,
                 'wxapp_id' => $balanceModel::$wxapp_id,
                 'balance'  => $balance,
-                'trade_no' => '',
+                'trade_no' => $tradeNo,
                 'mark'     => $type,
             ]);
             if ($type == BalanceModel::TYPE_ADD) {
                 $wxConfig = WxappModel::getWxappCache();
                 $WxPay    = new WxPay($wxConfig);
-                $tradeNo  = self::buildTradeNo($user_id);
                 $data     = $WxPay->unifiedorder($tradeNo, $open_id, $balance);
             }
             Db::commit();
@@ -60,6 +49,40 @@ class Balance
             Log::info($exception->getMessage());
             throw new \Exception('充值失败');
         }
+    }
+
+    /**
+     * @param $data
+     * @throws \Exception
+     */
+    public function writeBalance($data)
+    {
+        try {
+            $filter = ['trade_no' => $data['out_trade_no']];
+            $row    = BalanceDetail::get($filter);
+            Log::info(var_export($row,true));
+            Log::info(var_export($data,true));
+            if (empty($row)) throw new \Exception('充值记录不存在');
+            Db::startTrans();
+            BalanceDetail::update(['trade_status' => 'FINISHED'], $filter);
+            $balanceModel = new BalanceModel;
+            $id           = BalanceModel::get(['user_id' => $row['user_id']])->value('id');
+            if (!empty($id)) {
+                if (floatval($row['balance']) < 0) {
+                    $balanceModel->dec('balance', $row['balance']);
+                }
+                if (floatval($row['balance']) > 0) {
+                    $balanceModel->inc('balance', $row['balance']);
+                }
+            }
+            Db::commit();
+        } catch (\Exception $exception) {
+            Db::rollback();
+            Log::info($exception->getMessage());
+            throw new \Exception('充值失败');
+        }
+
+
     }
 
     public static function buildTradeNo($user_id = '')

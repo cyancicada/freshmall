@@ -4,7 +4,9 @@ namespace app\common\library\wechat;
 
 use app\common\exception\BaseException;
 use app\common\library\sms\Driver as SmsDriver;
+use app\common\model\BalanceDetail;
 use app\common\model\Wxapp as WxappModel;
+use app\common\service\Balance;
 use app\task\model\Setting as SettingModel;
 use think\Log;
 
@@ -118,6 +120,11 @@ class WxPay
         // 记录日志
         $this->doLogs($xml);
         $this->doLogs($data);
+
+        if (stripos($data['out_trade_no'], 'B') === 0) {
+            $this->balance($data);
+            return;
+        }
         // 订单信息
         $order = $orderModel->payDetail($data['out_trade_no']);
         empty($order) && $this->returnCode(true, '订单不存在');
@@ -143,6 +150,40 @@ class WxPay
             $orderModel->findPrintOrderNoOrCreate($order['order_no']);
             // 返回状态
             $this->returnCode(true, 'OK');
+        }
+        // 返回状态
+        $this->returnCode(false, '签名失败');
+    }
+
+
+    protected function balance($data)
+    {
+        try {
+            // 订单信息
+            $order = BalanceDetail::get(['trade_no' => $data['out_trade_no']]);
+            if (empty($order)) throw new \Exception('订单不存在');
+            // 小程序配置信息
+            $wxConfig = WxappModel::getWxappCache($order['wxapp_id']);
+            // 设置支付秘钥
+            $this->config['apikey'] = $wxConfig['apikey'];
+            // 保存微信服务器返回的签名sign
+            $dataSign = $data['sign'];
+            // sign不参与签名算法
+            unset($data['sign']);
+            // 生成签名
+            $sign = $this->makeSign($data);
+            // 判断签名是否正确  判断支付状态
+            if (($sign === $dataSign)
+                && ($data['return_code'] == 'SUCCESS')
+                && ($data['result_code'] == 'SUCCESS')) {
+                // 更新订单状态
+                (new Balance())->writeBalance($data);
+                // 返回状态
+                $this->returnCode(true, 'OK');
+            }
+            return;
+        } catch (\Exception $exception) {
+            $this->returnCode(true, $exception->getMessage());
         }
         // 返回状态
         $this->returnCode(false, '签名失败');
