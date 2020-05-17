@@ -60,8 +60,8 @@ class Balance
         try {
             $filter = ['trade_no' => $data['out_trade_no']];
             $row    = BalanceDetail::get($filter);
-            Log::info(var_export($row,true));
-            Log::info(var_export($data,true));
+            Log::info(var_export($row, true));
+            Log::info(var_export($data, true));
             if (empty($row)) throw new \Exception('充值记录不存在');
             Db::startTrans();
             BalanceDetail::update(['trade_status' => 'FINISHED'], $filter);
@@ -74,7 +74,13 @@ class Balance
                 if (floatval($row['balance']) > 0) {
                     $balanceModel->inc('balance', $row['balance']);
                 }
+                return;
             }
+            $balanceModel->save([
+                'user_id'  => $row['user_id'],
+                'wxapp_id' => $row['wxapp_id'],
+                'balance'  => $row['balance'],
+            ]);
             Db::commit();
         } catch (\Exception $exception) {
             Db::rollback();
