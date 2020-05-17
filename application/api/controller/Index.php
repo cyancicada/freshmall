@@ -26,7 +26,14 @@ class Index extends Controller
         $model = new GoodsModel;
         $newest = $model->getNewList();
         // 猜您喜欢
-        $best = $newest;//$model->getBestList();
+        try{
+            $user = $this->getUser();
+            $goodsIdList = $model->historyGoodsUserView($user['user_id']);
+            $best = $model->getBestList(['goods_id'=>['in',$goodsIdList]]);
+        }catch (\Exception $exception){
+            $best = $newest;//$model->getBestList();
+        }
+        if (empty($best)) $best = $newest;
         return $this->renderSuccess(compact('items', 'newest', 'best'));
     }
 
