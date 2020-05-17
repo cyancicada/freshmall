@@ -31,8 +31,8 @@ class Balance
             Db::startTrans();
             $id = $balanceModel->where('user_id', $user_id)->value('id');
             if (!empty($id)) {
-                if ($type == BalanceModel::TYPE_ADD) $this->inc('balance', $balance);
-                if ($type == BalanceModel::TYPE_CONSUMER) $this->dec('balance', $balance);
+                if ($type == BalanceModel::TYPE_ADD) $balanceModel->inc('balance', $balance);
+                if ($type == BalanceModel::TYPE_CONSUMER) $balanceModel->dec('balance', $balance);
             } else {
                 $balanceModel->save([
                     'user_id'  => $user_id,
