@@ -80,8 +80,8 @@ class Balance
                     'balance'  => $row['balance'],
                 ]);
             }
-            $latest_balance = $this->myBalance($row['user_id']);
-            BalanceDetail::update(['trade_status' => 'FINISHED', 'latest_balance' => $latest_balance], $filter);
+            $balance = $this->myBalance($row['user_id'], true);
+            BalanceDetail::update(['trade_status' => 'FINISHED', 'latest_balance' => $balance], $filter);
             Db::commit();
         } catch (\Exception $exception) {
             Db::rollback();
@@ -97,14 +97,14 @@ class Balance
      * @param $user_id
      * @throws \Exception
      */
-    public function myBalance($user_id)
+    public function myBalance($user_id, $onlyBalance = false)
     {
         try {
             $response = ['balance' => '0.00'];
             $balance  = BalanceModel::get(['user_id' => $user_id]);
             if (!empty($balance)) $response['balance'] = $balance['balance'];
 
-            return $response;
+            return $onlyBalance ? $response['balance'] : $response;
         } catch (\Exception $exception) {
             throw new \Exception('获取余额失败');
         }
