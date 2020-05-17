@@ -74,13 +74,13 @@ class Balance
                 if (floatval($row['balance']) > 0) {
                     $balanceRow->setInc('balance', $row['balance']);
                 }
-                return;
+            }else{
+                $balanceModel->save([
+                    'user_id'  => $row['user_id'],
+                    'wxapp_id' => $row['wxapp_id'],
+                    'balance'  => $row['balance'],
+                ]);
             }
-            $balanceModel->save([
-                'user_id'  => $row['user_id'],
-                'wxapp_id' => $row['wxapp_id'],
-                'balance'  => $row['balance'],
-            ]);
             Db::commit();
         } catch (\Exception $exception) {
             Db::rollback();
