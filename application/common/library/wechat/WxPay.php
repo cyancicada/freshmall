@@ -35,7 +35,7 @@ class WxPay
      * @return array
      * @throws BaseException
      */
-    public function unifiedorder($order_no, $openid, $total_fee)
+    public function unifiedorder($order_no, $openid, $total_fee,$type='ORDER')
     {
         // 当前时间
         $time = time();
@@ -50,6 +50,7 @@ class WxPay
             'nonce_str'        => $nonceStr,
             'notify_url'       => base_url() . 'notice.php',  // 异步通知地址
             'openid'           => $openid,
+            'type'             => $type,
             'out_trade_no'     => $order_no,
             'spbill_create_ip' => \request()->ip(),
             'total_fee'        => $total_fee * 100, // 价格:单位分
