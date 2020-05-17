@@ -58,22 +58,22 @@ class Balance
     public function writeBalance($data)
     {
         try {
-            $filter = ['trade_no' => $data['out_trade_no']];
+            $filter = ['trade_no' => $data['out_trade_no'], 'trade_status' => 'UNFINISHED'];
             $row    = BalanceDetail::get($filter);
 
             if (empty($row)) throw new \Exception('充值记录不存在');
             Db::startTrans();
             BalanceDetail::update(['trade_status' => 'FINISHED'], $filter);
             $balanceModel = new BalanceModel;
-            $userFilter = ['user_id' => $row['user_id']];
+            $userFilter   = ['user_id' => $row['user_id']];
             $balanceRow   = BalanceModel::get($userFilter);
             if (!empty($balanceRow)) {
-                Log::info(var_export($balanceRow,true));
+                Log::info(var_export($balanceRow, true));
                 if (floatval($row['balance']) < 0) {
-                    $balanceRow->dec('balance', $row['balance']);
+                    $balanceRow->setDec('balance', $row['balance']);
                 }
                 if (floatval($row['balance']) > 0) {
-                    $balanceRow->inc('balance', $row['balance']);
+                    $balanceRow->setInc('balance', $row['balance']);
                 }
                 return;
             }
