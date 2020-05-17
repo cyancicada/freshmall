@@ -68,7 +68,6 @@ class Balance
             $userFilter   = ['user_id' => $row['user_id']];
             $balanceRow   = BalanceModel::get($userFilter);
             if (!empty($balanceRow)) {
-                Log::info(var_export($balanceRow, true));
                 if (floatval($row['balance']) < 0) {
                     $balanceRow->setDec('balance', $row['balance']);
                 }
