@@ -37,7 +37,7 @@ class Balance extends Controller
     {
         $balanceModel = new BalanceModel();
         $request      = request();
-        $balance      = intval($request->post('balance'));
+        $balance      = $request->post('balance');
         if ($balanceModel->balanceOperate($this->user['user_id'], $balance)) {
             return $this->renderSuccess();
         }

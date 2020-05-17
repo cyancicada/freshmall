@@ -23,6 +23,7 @@ class Balance extends BaseModel
             $this->error = '充值金额错误';
             return false;
         }
+        $balance = floatval($balance);
         $type = $balance > 0 ? self::TYPE_ADD : self::TYPE_CONSUMER;
         try {
             Db::startTrans();
