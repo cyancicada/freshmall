@@ -74,7 +74,7 @@ class Balance
                 if (floatval($row['balance']) > 0) {
                     $balanceRow->setInc('balance', $row['balance']);
                 }
-            }else{
+            } else {
                 $balanceModel->save([
                     'user_id'  => $row['user_id'],
                     'wxapp_id' => $row['wxapp_id'],
@@ -88,6 +88,25 @@ class Balance
             throw new \Exception('充值失败');
         }
 
+
+    }
+
+
+    /** 我的余额
+     * @param $user_id
+     * @throws \Exception
+     */
+    public function myBalance($user_id)
+    {
+        try {
+            $response = ['balance' => '0.00'];
+            $balance  = BalanceModel::get(['user_id' => $user_id]);
+            if (!empty($balance)) $response['balance'] = $balance['balance'];
+            
+            return $response;
+        } catch (\Exception $exception) {
+            throw new \Exception('获取余额失败');
+        }
 
     }
 

@@ -49,4 +49,11 @@ class Balance extends Controller
         }
     }
 
+    /**
+     * 我的余额
+     */
+    public function me(){
+
+    }
+
 }
