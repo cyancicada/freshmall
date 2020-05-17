@@ -118,11 +118,8 @@ class Balance
     {
         try {
             $filter = ['user_id' => $user_id, 'trade_status' => 'FINISHED'];
-            $res    = (new BalanceDetail)->where($filter)->order(['create_time' => 'desc'])->select();
-            $data   = [];
+            $data    = (new BalanceDetail)->where($filter)->order(['create_time' => 'desc'])->select();
 
-            if (!empty($res)) $data = $res->toArray();
-          dd($res);
             foreach ($data as &$item) {
                 $item['type_name']   = isset(BalanceModel::$typeMap[$item['type']]) ? BalanceModel::$typeMap[$item['type']] : '其它';
             }
