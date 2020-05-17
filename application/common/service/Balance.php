@@ -66,13 +66,14 @@ class Balance
             Db::startTrans();
             BalanceDetail::update(['trade_status' => 'FINISHED'], $filter);
             $balanceModel = new BalanceModel;
-            $balanceRow   = BalanceModel::get(['user_id' => $row['user_id']]);
+            $userFilter = ['user_id' => $row['user_id']];
+            $balanceRow   = BalanceModel::get($userFilter);
             if (!empty($balanceRow)) {
                 if (floatval($row['balance']) < 0) {
-                    $balanceModel->dec('balance', $row['balance']);
+                    $balanceModel->where($userFilter)->dec('balance', $row['balance']);
                 }
                 if (floatval($row['balance']) > 0) {
-                    $balanceModel->inc('balance', $row['balance']);
+                    $balanceModel->where($userFilter)->inc('balance', $row['balance']);
                 }
                 return;
             }
