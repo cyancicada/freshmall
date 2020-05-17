@@ -63,7 +63,6 @@ class Balance
 
             if (empty($row)) throw new \Exception('记录不存在');
             Db::startTrans();
-            BalanceDetail::update(['trade_status' => 'FINISHED'], $filter);
             $balanceModel = new BalanceModel;
             $userFilter   = ['user_id' => $row['user_id']];
             $balanceRow   = BalanceModel::get($userFilter);
@@ -81,6 +80,8 @@ class Balance
                     'balance'  => $row['balance'],
                 ]);
             }
+            $latest_balance = $this->myBalance($row['user_id']);
+            BalanceDetail::update(['trade_status' => 'FINISHED', 'latest_balance' => $latest_balance], $filter);
             Db::commit();
         } catch (\Exception $exception) {
             Db::rollback();
@@ -118,10 +119,10 @@ class Balance
     {
         try {
             $filter = ['user_id' => $user_id, 'trade_status' => 'FINISHED'];
-            $data    = (new BalanceDetail)->where($filter)->order(['create_time' => 'desc'])->select();
+            $data   = (new BalanceDetail)->where($filter)->order(['create_time' => 'desc'])->select();
 
             foreach ($data as &$item) {
-                $item['type_name']   = isset(BalanceModel::$typeMap[$item['type']]) ? BalanceModel::$typeMap[$item['type']] : '其它';
+                $item['type_name'] = isset(BalanceModel::$typeMap[$item['type']]) ? BalanceModel::$typeMap[$item['type']] : '其它';
             }
             return $data;
         } catch (\Exception $exception) {
