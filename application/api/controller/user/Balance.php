@@ -53,7 +53,12 @@ class Balance extends Controller
      * 我的余额
      */
     public function me(){
-
+        try{// 发起微信支付
+            $balance      = (new BalanceService)->myBalance($this->user['user_id']);
+            return $this->renderSuccess($balance);
+        }catch (\Exception $exception){
+            return $this->renderError($exception->getCode() == 1 ? $exception->getMessage() :'操作异常');
+        }
     }
 
 }
