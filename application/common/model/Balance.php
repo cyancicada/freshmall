@@ -2,6 +2,8 @@
 
 namespace app\common\model;
 
+use app\api\model\Wxapp as WxappModel;
+use app\common\library\wechat\WxPay;
 use think\Cache;
 use think\Db;
 use think\Log;
@@ -31,7 +33,7 @@ class Balance extends BaseModel
             $id = $this->where('user_id', $user_id)->value('id');
             if (!empty($id)) {
                 if ($type == self::TYPE_ADD) $this->inc('balance', $balance);
-                if ($type == self::TYPE_CONSUMER) $this->inc('balance', $balance);
+                if ($type == self::TYPE_CONSUMER) $this->dec('balance', $balance);
             } else {
                 $this->save([
                     'user_id'  => $user_id,
@@ -46,6 +48,7 @@ class Balance extends BaseModel
                 'mark'     => $type,
             ]);
             Db::commit();
+            return true;
         } catch (\Exception $exception) {
             Db::rollback();
             Log::info($exception->getMessage());

@@ -3,7 +3,9 @@
 namespace app\api\controller\user;
 
 use app\api\controller\Controller;
-use app\common\model\Balance as BalanceModel;
+use app\api\model\Wxapp as WxappModel;
+use app\common\library\wechat\WxPay;
+use app\common\service\Balance as BalanceService;
 
 /**
  * 全额中心主页
@@ -35,13 +37,16 @@ class Balance extends Controller
      */
     public function balance()
     {
-        $balanceModel = new BalanceModel();
+        $balanceService = new BalanceService();
         $request      = request();
         $balance      = $request->post('balance');
-        if ($balanceModel->balanceOperate($this->user['user_id'], $balance)) {
-            return $this->renderSuccess();
+        try{// 发起微信支付
+            return $this->renderSuccess([
+                'payment'  => $balanceService->balanceOperate($this->user['user_id'],$this->user['open_id'], $balance),
+            ]);
+        }catch (\Exception $exception){
+            return $this->renderError($exception->getCode() == 1 ? $exception->getMessage() :'操作异常');
         }
-        return $this->renderError($balanceModel->getError());
     }
 
 }
