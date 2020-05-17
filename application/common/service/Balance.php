@@ -121,7 +121,8 @@ class Balance
             $data   = (new BalanceDetail)->where($filter)->order(['create_time' => 'desc'])->select();
 
             foreach ($data as &$item) {
-                $item['type_name'] = isset(BalanceModel::$typeMap[$item['type_name']]) ? BalanceModel::$typeMap[$item['type_name']] : '其它';
+                $item['type_name']   = isset(BalanceModel::$typeMap[$item['type_name']]) ? BalanceModel::$typeMap[$item['type_name']] : '其它';
+                $item['create_time'] = date('Y-m-d H:i:s', $item['create_time']);
             }
             return $data;
         } catch (\Exception $exception) {
