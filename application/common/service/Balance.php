@@ -66,8 +66,8 @@ class Balance
             Db::startTrans();
             BalanceDetail::update(['trade_status' => 'FINISHED'], $filter);
             $balanceModel = new BalanceModel;
-            $id           = BalanceModel::get(['user_id' => $row['user_id']])->value('id');
-            if (!empty($id)) {
+            $balanceRow   = BalanceModel::get(['user_id' => $row['user_id']]);
+            if (!empty($balanceRow)) {
                 if (floatval($row['balance']) < 0) {
                     $balanceModel->dec('balance', $row['balance']);
                 }
