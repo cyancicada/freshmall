@@ -5,6 +5,7 @@ namespace app\api\controller\user;
 use app\api\controller\Controller;
 use app\api\model\Order as OrderModel;
 use app\common\model\PrintOrder;
+use app\common\model\Balance;
 
 /**
  * 个人中心主页
@@ -29,8 +30,9 @@ class Index extends Controller
             'payment'  => $model->getCount($userInfo['user_id'], 'payment'),
             'received' => $model->getCount($userInfo['user_id'], 'received'),
         ];
+        $balance              = Balance::get(['user_id' => $userInfo['user_id']]);
         $userInfo['is_print'] = PrintOrder::isPrintByOpenId($userInfo['open_id']);
-        return $this->renderSuccess(compact('userInfo', 'orderCount', 'isPrint'));
+        return $this->renderSuccess(compact('userInfo', 'orderCount', 'isPrint', 'balance'));
     }
 
 }
