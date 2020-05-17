@@ -60,8 +60,7 @@ class Balance
         try {
             $filter = ['trade_no' => $data['out_trade_no']];
             $row    = BalanceDetail::get($filter);
-            Log::info(var_export($row, true));
-            Log::info(var_export($data, true));
+
             if (empty($row)) throw new \Exception('充值记录不存在');
             Db::startTrans();
             BalanceDetail::update(['trade_status' => 'FINISHED'], $filter);
@@ -69,11 +68,12 @@ class Balance
             $userFilter = ['user_id' => $row['user_id']];
             $balanceRow   = BalanceModel::get($userFilter);
             if (!empty($balanceRow)) {
+                Log::info(var_export($balanceRow,true));
                 if (floatval($row['balance']) < 0) {
-                    $balanceModel->where($userFilter)->dec('balance', $row['balance']);
+                    $balanceRow->dec('balance', $row['balance']);
                 }
                 if (floatval($row['balance']) > 0) {
-                    $balanceModel->where($userFilter)->inc('balance', $row['balance']);
+                    $balanceRow->inc('balance', $row['balance']);
                 }
                 return;
             }
