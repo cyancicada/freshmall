@@ -2,6 +2,7 @@
 
 namespace app\store\controller;
 
+use app\api\model\Goods as GoodsModel;
 use app\common\model\BaseModel;
 use app\store\model\Order as OrderModel;
 use think\cache\driver\Redis;
@@ -166,7 +167,11 @@ class Order extends Controller
      */
     public function print()
     {
-        $orderSn = $this->request->post('order_sn', null);
+        $model = new GoodsModel;
+        $goodsIdList = [10081,10061,10073,10202,10242,10054];
+        dd($model->getBestList([
+            'goods_id'=>['in',$goodsIdList]
+        ],$goodsIdList));
         if ($this->request->isPost() && !empty($orderSn)) {
             $model = new OrderModel;
             foreach (explode(',', str_replace('，', ',', $orderSn)) as $sn) {

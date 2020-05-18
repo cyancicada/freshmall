@@ -3,6 +3,7 @@
 namespace app\common\model;
 
 use think\cache\driver\Redis;
+use think\Db;
 use think\Log;
 use think\Request;
 
@@ -194,13 +195,18 @@ class Goods extends BaseModel
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getBestList($fileter)
+    public function getBestList($fileter,$goodsId = [])
     {
-        return $this->with(['spec', 'category', 'image.file'])
+        $_this = $this->with(['spec', 'category', 'image.file'])
             ->where($fileter)
             ->where('is_delete', '=', 0)
-            ->where('goods_status', '=', 10)
-            ->select();
+            ->where('goods_status', '=', 10);
+
+        if (!empty($goodsId)){
+            $orderField = 'field(goods_id,'.implode(',',$goodsId).')';
+            return $_this->orderRaw($orderField)->select();
+        }
+        return $_this->select();
     }
 
     /**
@@ -256,9 +262,10 @@ class Goods extends BaseModel
     public function historyGoodsUserView($userId, $goodsId = '')
     {
         $redis = new Redis();
+
         $k     = sprintf(self::HISTORY_VIEW, $userId);
         if (!empty($goodsId)) {
-            $redis->handler()->zAdd($k, time(),$goodsId);
+            $redis->handler()->zIncrBy($k, 1,$goodsId);
             return [$goodsId];
         }
         if ($redis->handler()->exists($k)) {
