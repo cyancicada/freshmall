@@ -2,8 +2,8 @@
 
 namespace app\api\controller;
 
-use app\api\model\WxappPage;
 use app\api\model\Goods as GoodsModel;
+use app\api\model\WxappPage;
 
 /**
  * 首页控制器
@@ -27,9 +27,9 @@ class Index extends Controller
         $newest = $model->getNewList();
         // 猜您喜欢
         try{
-            $user = $this->getUser();
+            $user        = $this->getUser();
             $goodsIdList = $model->historyGoodsUserView($user['user_id']);
-            $best = $model->getBestList(['goods_id'=>['in',$goodsIdList]]);
+            $best        = $model->getBestList(['goods_id' => ['in', $goodsIdList]], $goodsIdList);
         }catch (\Exception $exception){
             $best = $newest;//$model->getBestList();
         }
