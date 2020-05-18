@@ -37,6 +37,7 @@ services:
   rabbit_consumer:
     image: kyangs/rabbit-consumer:latest
     container_name: rabbit_consumer
+    restart:  on-failure
     networks:
       - default
     depends_on:
