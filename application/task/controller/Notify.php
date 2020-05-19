@@ -30,6 +30,9 @@ class Notify
         $body = file_get_contents('php://input');
         Log::info('php://input=>' . $body);
         $request = json_encode($body);
+
+        Log::info('input=request:order_id'.$request->order_id);
+        Log::info('input=request:user_id'.$request->user_id);
         if (isset($request->order_id) &&
             !empty($request->order_id) &&
             isset($request->user_id) &&
@@ -48,7 +51,7 @@ class Notify
                         break;
                 }
             } catch (\Exception $exception) {
-
+                Log::info('input=Exception:'.$exception->getMessage());
             }
         }
         die('SUCCESS');
