@@ -29,7 +29,7 @@ class Notify
     {
         $body = file_get_contents('php://input');
         Log::info('php://input=>' . $body);
-        $request = json_encode($body);
+        $request = json_decode($body);
 
         Log::info('input=request:order_id'.$request->order_id);
         Log::info('input=request:user_id'.$request->user_id);
