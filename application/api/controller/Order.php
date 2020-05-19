@@ -58,7 +58,7 @@ class Order extends Controller
         // 创建订单
         if ($model->add($this->user['user_id'], $order)) {
 
-            self::pushOrderMegToMQ($order);
+            self::pushOrderMegToMQ($model);
             // 发起微信支付
             return $this->renderSuccess([
                 'payment'  => $this->wxPay($model['order_no'], $this->user['open_id']
