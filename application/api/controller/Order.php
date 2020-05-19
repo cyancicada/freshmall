@@ -5,7 +5,9 @@ namespace app\api\controller;
 use app\api\model\Order as OrderModel;
 use app\api\model\Wxapp as WxappModel;
 use app\api\model\Cart as CartModel;
+use app\common\library\mq\RabbitMQ;
 use app\common\library\wechat\WxPay;
+use app\task\model\Setting as SettingModel;
 use think\Log;
 
 /**
@@ -55,17 +57,31 @@ class Order extends Controller
         if (!isset($order['delivery_time'])) $order['delivery_time'] = $delivery_time;
         // 创建订单
         if ($model->add($this->user['user_id'], $order)) {
+
+            self::pushOrderMegToMQ($order);
             // 发起微信支付
             return $this->renderSuccess([
                 'payment'  => $this->wxPay($model['order_no'], $this->user['open_id']
                     , $order['order_pay_price']),
                 'order_id' => $model['order_id']
             ]);
+
         }
         $error = $model->getError() ?: '订单创建失败';
         return $this->renderError($error);
     }
 
+    public static function pushOrderMegToMQ($data, $delay = 0, $retryTime = 0)
+    {
+
+        $values = SettingModel::getItem('trade');
+        $day    = isset($values['order']['close_days']) ? intval($values['order']['close_days']) : 2;
+        RabbitMQ::instance()->push([
+            'data'      => $data,
+            'delay'     => $delay === 0 ? $day * 86400000 : $delay,
+            'retryTime' => $retryTime,
+        ]);
+    }
     /**
      * 订单确认-购物车结算
      * @return array

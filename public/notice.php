@@ -3,7 +3,7 @@
 // [ 支付通知入口文件 ]
 
 // 手动定义路由
-$_GET['s'] = '/task/notify/order';
+$_GET['s'] = isset($_GET['s'] ) ? $_GET['s']  : '/task/notify/order';
 
 // 定义运行目录
 define('WEB_PATH', __DIR__ . '/');

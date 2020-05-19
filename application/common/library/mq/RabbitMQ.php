@@ -17,6 +17,8 @@ class RabbitMQ
     private $queueName = 'queue_name';
     private $password  = 'admin';
 
+    private $url;
+
     private $channel;
 
     /**
@@ -32,6 +34,9 @@ class RabbitMQ
         if (Config::get('mq.user')) $this->user = Config::get('mq.user');
         if (Config::get('mq.password')) $this->password = Config::get('mq.password');
         if (Config::get('mq.queue_name')) $this->queueName = Config::get('mq.queue_name');
+        if (Config::get('mq.url')) $this->url = Config::get('mq.url');
+
+        if (empty($this->url)) $this->url =  base_url() . 'notice.php?s=/task/notify/mq';
 
         $this->channel = (new AMQPStreamConnection($this->host, $this->post, $this->user, $this->password))
             ->channel();
@@ -54,6 +59,8 @@ class RabbitMQ
     public function push($array)
     {
         if (empty($array)) return false;
+
+        if (!isset($array['url'])) $array['url'] = $this->url;
 
         self::$instance->getChannel()->basic_publish(new AMQPMessage(json_encode($array)), '', $this->queueName);
 

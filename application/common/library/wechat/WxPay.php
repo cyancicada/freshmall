@@ -3,12 +3,14 @@
 namespace app\common\library\wechat;
 
 use app\common\exception\BaseException;
+use app\common\library\mq\RabbitMQ;
 use app\common\library\sms\Driver as SmsDriver;
 use app\common\model\BalanceDetail;
 use app\common\model\Wxapp as WxappModel;
 use app\common\service\Balance;
 use app\task\model\Setting as SettingModel;
 use think\Log;
+use app\task\model\Order;
 
 /**
  * 微信支付
@@ -84,7 +86,7 @@ class WxPay
 
     /**
      * 支付成功异步通知
-     * @param \app\task\model\Order $orderModel
+     * @param Order $orderModel
      * @throws BaseException
      * @throws \Exception
      * @throws \think\exception\DbException
@@ -125,37 +127,67 @@ class WxPay
             $this->balance($data);
             return;
         }
-        // 订单信息
-        $order = $orderModel->payDetail($data['out_trade_no']);
-        empty($order) && $this->returnCode(true, '订单不存在');
-        // 小程序配置信息
-        $wxConfig = WxappModel::getWxappCache($order['wxapp_id']);
-        // 设置支付秘钥
-        $this->config['apikey'] = $wxConfig['apikey'];
-        // 保存微信服务器返回的签名sign
-        $dataSign = $data['sign'];
-        // sign不参与签名算法
-        unset($data['sign']);
-        // 生成签名
-        $sign = $this->makeSign($data);
-        // 判断签名是否正确  判断支付状态
-        if (($sign === $dataSign)
-            && ($data['return_code'] == 'SUCCESS')
-            && ($data['result_code'] == 'SUCCESS')) {
-            // 更新订单状态
-            $order->updatePayStatus($data['transaction_id']);
-            // 发送短信通知
-            $this->sendSms($order['wxapp_id'], $order['order_no']);
-            //记录已经支付的id，供打印机打印
-            $orderModel->findPrintOrderNoOrCreate($order['order_no']);
+        $this->updateOrder($data);
+    }
+
+
+    /** 订单操作
+     * @param $data
+     */
+    protected function updateOrder($data)
+    {
+        try {
+            // 订单信息
+            $order = (new Order)->payDetail($data['out_trade_no']);
+            empty($order) && $this->returnCode(true, '订单不存在');
+            // 小程序配置信息
+            $wxConfig = WxappModel::getWxappCache($order['wxapp_id']);
+            // 设置支付秘钥
+            $this->config['apikey'] = $wxConfig['apikey'];
+            // 保存微信服务器返回的签名sign
+            $dataSign = $data['sign'];
+            // sign不参与签名算法
+            unset($data['sign']);
+            // 生成签名
+            $sign = $this->makeSign($data);
+            // 判断签名是否正确  判断支付状态
+            if (($sign === $dataSign)
+                && ($data['return_code'] == 'SUCCESS')
+                && ($data['result_code'] == 'SUCCESS')) {
+                // 更新订单状态
+                $order->updatePayStatus($data['transaction_id']);
+                // 发送短信通知
+                $this->sendSms($order['wxapp_id'], $order['order_no']);
+                //记录已经支付的id，供打印机打印
+                $order->findPrintOrderNoOrCreate($order['order_no']);
+                self::pushOrderMegToMQ($order);
+                // 返回状态
+                $this->returnCode(true, 'OK');
+            }
             // 返回状态
-            $this->returnCode(true, 'OK');
+            $this->returnCode(false, '签名失败');
+        } catch (\Exception $exception) {
+            $this->returnCode(true, $exception->getMessage());
         }
         // 返回状态
         $this->returnCode(false, '签名失败');
     }
 
+    public static function pushOrderMegToMQ($data, $delay = 0, $retryTime = 0)
+    {
 
+        $values = SettingModel::getItem('trade');
+        $day    = isset($values['order']['receive_days']) ? intval($values['order']['receive_days']) : 2;
+        RabbitMQ::instance()->push([
+            'data'      => $data,
+            'delay'     => $delay === 0 ? $day * 86400000 : $delay,
+            'retryTime' => $retryTime,
+        ]);
+    }
+
+    /** 余额操作
+     * @param $data
+     */
     protected function balance($data)
     {
         try {
