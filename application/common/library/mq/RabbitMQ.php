@@ -62,6 +62,8 @@ class RabbitMQ
 
         if (!isset($array['url'])) $array['url'] = $this->url;
 
+        $array['url'] = str_replace('https','http',$array['url']);
+
         self::$instance->getChannel()->basic_publish(new AMQPMessage(json_encode($array)), '', $this->queueName);
 
         return true;
