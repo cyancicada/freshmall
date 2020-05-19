@@ -1,0 +1,49 @@
+version: '3.1'
+services:
+  #  etcdv3_1:
+  #    image: bitnami/etcd:3
+  #    container_name: etcdv3_1
+  #    ports:
+  #      - 2379:2379
+  #      - 2380:2380
+  #    environment:
+  #      - ALLOW_NONE_AUTHENTICATION=yes
+  #      - ETCD_NAME=etcdv3_1
+  #      - ETCD_INITIAL_ADVERTISE_PEER_URLS=http://etcdv3_1:2380
+  #      - ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380
+  #      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+  #      - ETCD_ADVERTISE_CLIENT_URLS=http://etcdv3_1:2379
+  #      - ETCD_INITIAL_CLUSTER_TOKEN=etcd-cluster
+  #      - ETCD_INITIAL_CLUSTER=etcdv3_1=http://etcdv3_1:2380
+  #      - ETCD_INITIAL_CLUSTER_STATE=new
+  #    volumes:
+  #      - ./etcdv3_1/data:/bitnami
+
+  rabbitmq_1:
+    image: rabbitmq:management
+    container_name: rabbitmq_1
+    networks:
+      - default
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - "./rabbitmq_1/plugins/rabbitmq_delayed_message_exchange-3.8.0.ez:/plugins/rabbitmq_delayed_message_exchange-3.8.0.ez"
+      - "./rabbitmq_1/plugins/enabled_plugins:/etc/rabbitmq/enabled_plugins"
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin123
+
+  rabbit_consumer:
+    image: kyangs/rabbit-consumer:latest
+    container_name: rabbit_consumer
+    restart:  on-failure
+    networks:
+      - default
+    depends_on:
+      - rabbitmq_1
+    volumes:
+      - "./rabbit_consumer/logs:/tmp/apps/logs"
+      - "./rabbit_consumer/config.json:/tmp/apps/config.json"
+networks:
+  default:
