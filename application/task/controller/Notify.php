@@ -27,7 +27,7 @@ class Notify
     public function mq()
     {
         $body = file_get_contents('php://input');
-        Log::info($body);
+        Log::info('php://input=>'.$body);
         $request = json_encode($body);
     }
 
