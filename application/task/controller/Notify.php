@@ -39,12 +39,12 @@ class Notify
             !empty($request->user_id)) {
             try {
                 $model = ApiOrderModel::getUserOrderDetail($request->order_id, $request->user_id);
-                if (empty($model)) $model = $model->toArray();
+                $order = [];
+                if (!empty($model)) $order = $model->toArray();
+                if (empty($order)) die('SUCCESS');
 
-                Log::info('input=pay_status:'.$model['pay_status']);
-                if (empty($model)) die('SUCCESS');
-
-                switch (intval($model['pay_status'])) {
+                Log::info('input=pay_status:'.$order['pay_status']);
+                switch (intval($order['pay_status'])) {
                     case 10:
                         $model->cancel();
                         break;
