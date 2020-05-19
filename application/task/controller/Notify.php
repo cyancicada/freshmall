@@ -4,6 +4,7 @@ namespace app\task\controller;
 
 use app\task\model\Order as OrderModel;
 use app\common\library\wechat\WxPay;
+use app\api\model\Order as ApiOrderModel;
 use think\Log;
 
 /**
@@ -27,8 +28,29 @@ class Notify
     public function mq()
     {
         $body = file_get_contents('php://input');
-        Log::info('php://input=>'.$body);
+        Log::info('php://input=>' . $body);
         $request = json_encode($body);
+        if (isset($request->order_id) &&
+            !empty($request->order_id) &&
+            isset($request->user_id) &&
+            !empty($request->user_id)) {
+            try {
+                $model = ApiOrderModel::getUserOrderDetail($request->order_id, $request->user_id);
+                if (empty($orderInfo)) die('SUCCESS');
+
+                switch (intval($orderInfo['pay_status'])) {
+                    case 10:
+                        $model->cancel();
+                        break;
+                    case 20:
+                        $model->receipt();
+                        break;
+                }
+            } catch (\Exception $exception) {
+
+            }
+        }
+        die('SUCCESS');
     }
 
 }
