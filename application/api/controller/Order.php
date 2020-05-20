@@ -67,7 +67,7 @@ class Order extends Controller
                 $order['use_balance'] = $order['order_pay_price'];
             }else{
                 $order['order_pay_price'] = $order['order_pay_price']-$balance;
-                $order['order_pay_price'] = $balance;
+                $order['use_balance'] = $balance;
             }
         }
         // 创建订单
