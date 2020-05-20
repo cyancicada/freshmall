@@ -2,9 +2,9 @@
 
 namespace app\api\model;
 
-use think\Db;
-use app\common\model\Order as OrderModel;
 use app\common\exception\BaseException;
+use app\common\model\Order as OrderModel;
+use think\Db;
 
 /**
  * 订单模型
@@ -132,15 +132,16 @@ class Order extends OrderModel
         }
         // 记录订单信息
         $this->save([
-            'user_id' => $user_id,
-            'wxapp_id' => self::$wxapp_id,
-            'order_no' => $this->orderNo(),
-            'total_price' => $order['order_total_price'],
-            'pay_price' => $order['order_pay_price'],
-            'express_price' => $order['express_price'],
+            'user_id'             => $user_id,
+            'wxapp_id'            => self::$wxapp_id,
+            'order_no'            => $this->orderNo(),
+            'total_price'         => $order['order_total_price'],
+            'use_balance'         => $order['use_balance'],
+            'pay_price'           => $order['order_pay_price'],
+            'express_price'       => $order['express_price'],
             'claim_delivery_time' => $day,
-            'claim_time_range' => $timeRange,
-            'remark'    => $order['remark'],
+            'claim_time_range'    => $timeRange,
+            'remark'              => $order['remark'],
         ]);
         // 订单商品列表
         $goodsList = [];
