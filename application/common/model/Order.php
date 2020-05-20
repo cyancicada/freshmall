@@ -69,6 +69,7 @@ class Order extends BaseModel
      */
     public function consumerBalance($userId, $balance, $orderNo, $refund = false)
     {
+        if (floatval($balance) <= 0) return false;
 
         $b = Balance::get(['user_id' => $userId, 'wxapp_id' => self::$wxapp_id]);
         if (empty($b)) return false;
