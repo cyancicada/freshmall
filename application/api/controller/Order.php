@@ -7,6 +7,7 @@ use app\api\model\Wxapp as WxappModel;
 use app\api\model\Cart as CartModel;
 use app\common\library\mq\RabbitMQ;
 use app\common\library\wechat\WxPay;
+use app\common\service\Balance;
 use app\task\model\Setting as SettingModel;
 use think\Log;
 
@@ -55,6 +56,20 @@ class Order extends Controller
         }
         $order['remark'] = $this->request->post('remark');
         if (!isset($order['delivery_time'])) $order['delivery_time'] = $delivery_time;
+        if ($this->request->post('useBalance')) {
+            $balance = round($this->request->post('balance',0));
+            $balanceService = new Balance;
+
+            if ($balance <= 0) $balance = $balanceService->myBalance($this->user['user_id'],true);
+
+            if ($balance >= $order['order_pay_price']) {
+                $order['order_pay_price'] = 0.00;
+                $order['use_balance'] = $order['order_pay_price'];
+            }else{
+                $order['order_pay_price'] = $order['order_pay_price']-$balance;
+                $order['order_pay_price'] = $balance;
+            }
+        }
         // 创建订单
         if ($model->add($this->user['user_id'], $order)) {
 

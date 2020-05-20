@@ -104,7 +104,7 @@ class Balance
             $balance  = BalanceModel::get(['user_id' => $user_id]);
             if (!empty($balance)) $response['balance'] = $balance['balance'];
 
-            return $onlyBalance ? $response['balance'] : $response;
+            return $onlyBalance ? round($response['balance'],2) : $response;
         } catch (\Exception $exception) {
             throw new \Exception('获取余额失败');
         }
