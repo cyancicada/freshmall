@@ -136,7 +136,7 @@ class Order extends OrderModel
             'wxapp_id'            => self::$wxapp_id,
             'order_no'            => $this->orderNo(),
             'total_price'         => $order['order_total_price'],
-            'use_balance'         => $order['use_balance'],
+            'use_balance'         => isset($order['use_balance']) ? $order['use_balance'] : 0,
             'pay_price'           => $order['order_pay_price'],
             'express_price'       => $order['express_price'],
             'claim_delivery_time' => $day,
