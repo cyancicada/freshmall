@@ -130,8 +130,7 @@ class Order extends OrderModel
         if (isset($order['delivery_time']) && !empty($order['delivery_time'])) {
             list($day, $timeRange) = self::captureTime($order['delivery_time']);
         }
-        // 记录订单信息
-        $this->save([
+        $orderInfo = [
             'user_id'             => $user_id,
             'wxapp_id'            => self::$wxapp_id,
             'order_no'            => $this->orderNo(),
@@ -142,7 +141,10 @@ class Order extends OrderModel
             'claim_delivery_time' => $day,
             'claim_time_range'    => $timeRange,
             'remark'              => $order['remark'],
-        ]);
+        ];
+        // 记录订单信息
+        $this->save($orderInfo);
+        $this->takeOffBalance($user_id,$orderInfo['use_balance'],$orderInfo['order_no']);
         // 订单商品列表
         $goodsList = [];
         // 更新商品库存 (下单减库存)

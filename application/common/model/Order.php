@@ -58,6 +58,39 @@ class Order extends BaseModel
         return $this->hasMany('OrderGoods');
     }
 
+
+    /**
+     * @param $userId
+     * @param $balance
+     * @param $orderNo
+     * @return bool|false|int
+     * @throws \think\Exception
+     * @throws \think\exception\DbException
+     */
+    public function takeOffBalance($userId, $balance, $orderNo)
+    {
+
+        $b = Balance::get(['user_id' => $userId, 'wxapp_id' => self::$wxapp_id]);
+        if (empty($b)) return false;
+
+        $b->setDec('balance', $balance);
+
+        return (new BalanceDetail)->save([
+            'user_id'      => $userId,
+            'wxapp_id'     => self::$wxapp_id,
+            'balance'      => '-' . $balance,
+            'trade_status' => 'FINISHED',
+            'trade_no'     => Balance::buildTradeNo($userId),
+            'type'         => Balance::TYPE_CONSUMER,
+            'mark'         => '支付订单：' . $orderNo,
+        ]);
+    }
+
+    public function balanceDetailModel()
+    {
+        return new Balance;
+    }
+
     /**
      * 关联订单收货地址表
      * @return \think\model\relation\HasOne

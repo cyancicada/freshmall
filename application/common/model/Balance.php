@@ -21,4 +21,10 @@ class Balance extends BaseModel
         self::TYPE_CONSUMER => '消费',
         self::TYPE_REFUND   => '退款',
     ];
+
+
+    public static function buildTradeNo($user_id = '')
+    {
+        return 'B' . $user_id . date('YmdHis');
+    }
 }
