@@ -244,6 +244,10 @@ class Order extends OrderModel
             $this->error = '已付款订单不可取消';
             return false;
         }
+        if ($this['order_status'] == 20) {
+            $this->error = '已取消订单不可重复取消';
+            return false;
+        }
         try {
             DB::startTrans();
             // 回退商品库存
