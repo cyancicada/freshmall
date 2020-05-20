@@ -67,14 +67,25 @@ class Order extends BaseModel
      * @throws \think\Exception
      * @throws \think\exception\DbException
      */
-    public function takeOffBalance($userId, $balance, $orderNo)
+    public function consumerBalance($userId, $balance, $orderNo, $refund = false)
     {
 
         $b = Balance::get(['user_id' => $userId, 'wxapp_id' => self::$wxapp_id]);
         if (empty($b)) return false;
+        if ($refund) {
+            $b->setInc('balance', $balance);
+            return (new BalanceDetail)->save([
+                'user_id'      => $userId,
+                'wxapp_id'     => self::$wxapp_id,
+                'balance'      => $balance,
+                'trade_status' => 'FINISHED',
+                'trade_no'     => Balance::buildTradeNo($userId),
+                'type'         => Balance::TYPE_REFUND,
+                'mark'         => '取消订单：' . $orderNo,
+            ]);
+        }
 
         $b->setDec('balance', $balance);
-
         return (new BalanceDetail)->save([
             'user_id'      => $userId,
             'wxapp_id'     => self::$wxapp_id,
