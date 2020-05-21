@@ -3,14 +3,12 @@
 namespace app\common\library\wechat;
 
 use app\common\exception\BaseException;
-use app\common\library\mq\RabbitMQ;
-use app\common\library\sms\Driver as SmsDriver;
 use app\common\model\BalanceDetail;
 use app\common\model\Wxapp as WxappModel;
 use app\common\service\Balance;
-use app\task\model\Setting as SettingModel;
-use think\Log;
 use app\task\model\Order;
+use app\task\service\NotifyService;
+use think\Log;
 
 /**
  * 微信支付
@@ -155,12 +153,10 @@ class WxPay
                 && ($data['return_code'] == 'SUCCESS')
                 && ($data['result_code'] == 'SUCCESS')) {
                 // 更新订单状态
-                $order->updatePayStatus($data['transaction_id']);
-                // 发送短信通知
-                $this->sendSms($order['wxapp_id'], $order['order_no']);
-                //记录已经支付的id，供打印机打印
-                $order->findPrintOrderNoOrCreate($order['order_no']);
-                self::pushOrderMegToMQ($order);
+                try {
+                    NotifyService::updateOrder($data['out_trade_no'], $data['transaction_id']);
+                    $this->returnCode(true, 'OK');
+                } catch (\Exception $exception) { $this->returnCode(false); }
                 // 返回状态
                 $this->returnCode(true, 'OK');
             }
@@ -171,18 +167,6 @@ class WxPay
         }
         // 返回状态
         $this->returnCode(false, '签名失败');
-    }
-
-    public static function pushOrderMegToMQ($data, $delay = 0, $retryTime = 0)
-    {
-
-        $values = SettingModel::getItem('trade');
-        $day    = isset($values['order']['receive_days']) ? intval($values['order']['receive_days']) : 2;
-        RabbitMQ::instance()->push([
-            'data'      => $data,
-            'delay'     => $delay === 0 ? $day * 86400000 : $delay,
-            'retryTime' => $retryTime,
-        ]);
     }
 
     /** 余额操作
@@ -219,21 +203,6 @@ class WxPay
         }
         // 返回状态
         $this->returnCode(false, '签名失败');
-    }
-
-    /**
-     * 发送短信通知
-     * @param $wxapp_id
-     * @param $order_no
-     * @return mixed
-     * @throws \think\Exception
-     */
-    private function sendSms($wxapp_id, $order_no)
-    {
-        // 短信配置信息
-        $config    = SettingModel::getItem('sms', $wxapp_id);
-        $SmsDriver = new SmsDriver($config);
-        return $SmsDriver->sendSms('order_pay', compact('order_no'));
     }
 
     /**

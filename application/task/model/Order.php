@@ -30,7 +30,7 @@ class Order extends OrderModel
      * @return false|int
      * @throws \Exception
      */
-    public function updatePayStatus($transaction_id)
+    public function updatePayStatus($transaction_id, $userBalance = false)
     {
         Db::startTrans();
         // 更新商品库存、销量
@@ -51,6 +51,8 @@ class Order extends OrderModel
                 'delivery_time'   => time(),
             ]);
         }
+        if ($userBalance) $this->consumerBalance($this['user_id'], $this['pay_price'], $this['order_no']);
+
         $this->save($data);
         Db::commit();
         return true;

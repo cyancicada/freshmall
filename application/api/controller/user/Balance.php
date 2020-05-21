@@ -3,9 +3,9 @@
 namespace app\api\controller\user;
 
 use app\api\controller\Controller;
-use app\api\model\Wxapp as WxappModel;
-use app\common\library\wechat\WxPay;
+use app\api\model\Order as OrderModel;
 use app\common\service\Balance as BalanceService;
+use app\task\service\NotifyService;
 
 /**
  * 全额中心主页
@@ -70,6 +70,36 @@ class Balance extends Controller
         }catch (\Exception $exception){
             return $this->renderError($exception->getCode() == 1 ? $exception->getMessage() :'操作异常');
         }
+    }
+
+
+    /**
+     * 立即支付
+     * @param $order_id
+     * @return array
+     * @throws \app\common\exception\BaseException
+     * @throws \think\exception\DbException
+     */
+    public function pay()
+    {
+        $request       = request();
+        $order_id      = $request->post('order_id');
+        $delivery_time = $request->post('delivery_time');
+        // 订单详情
+        $order = OrderModel::getUserOrderDetail($order_id, $this->user['user_id']);
+        // 判断商品状态、库存
+        if (!$order->checkGoodsStatusFromOrder($order['goods'])) {
+            return $this->renderError($order->getError());
+        }
+        OrderModel::updateClaimDeliveryTime($order_id, $delivery_time);
+        // 支付
+        try {
+            NotifyService::updateOrder($order['order_no'], $order['transaction_id'], true);
+            return $this->renderSuccess();
+        } catch (\Exception $exception) {
+            return $this->renderError('支付失败');
+        }
+
     }
 
 }
