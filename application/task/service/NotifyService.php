@@ -55,7 +55,7 @@ class NotifyService
      * @param int $retryTime
      * @author kyang
      */
-    public static function pushOrderMegToMQ($data, $settingKey = 'trade.order.receive_days', $retryTime = 0)
+    public static function pushOrderMegToMQ($data, $settingKey = 'trade.order.receive_days', $extra = [], $retryTime = 0)
     {
 
         if (empty($settingKey)) return;
@@ -70,10 +70,10 @@ class NotifyService
 
         $day = isset($values[$typeKey][$dayKey]) ? intval($values[$typeKey][$dayKey]) : 0;
 
-        RabbitMQ::instance()->push([
+        RabbitMQ::instance()->push(array_merge([
             'data'      => $data,
             'delay'     => $day * 86400000,
             'retryTime' => $retryTime,
-        ]);
+        ], $extra));
     }
 }
