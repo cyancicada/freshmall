@@ -9,6 +9,7 @@ use app\common\library\mq\RabbitMQ;
 use app\common\library\wechat\WxPay;
 use app\common\service\Balance;
 use app\task\model\Setting as SettingModel;
+use app\task\service\NotifyService;
 use think\Log;
 
 /**
@@ -56,24 +57,16 @@ class Order extends Controller
         }
         $order['remark'] = $this->request->post('remark');
         if (!isset($order['delivery_time'])) $order['delivery_time'] = $delivery_time;
-        if ($this->request->post('useBalance')) {
-            $balance = round($this->request->post('balance',0));
-            $balanceService = new Balance;
 
-            if ($balance <= 0) $balance = $balanceService->myBalance($this->user['user_id'],true);
-
-            if ($balance >= $order['order_pay_price']) {
-                $order['order_pay_price'] = 0.00;
-                $order['use_balance'] = $order['order_pay_price'];
-            }else{
-                $order['order_pay_price'] = $order['order_pay_price']-$balance;
-                $order['use_balance'] = $balance;
-            }
-        }
         // 创建订单
         if ($model->add($this->user['user_id'], $order)) {
 
-            self::pushOrderMegToMQ($model);
+            $values = SettingModel::getItem('trade');
+            $day    = isset($values['order']['close_days']) ? intval($values['order']['close_days']) : 2;
+            NotifyService::pushOrderMegToMQ([
+                'data'      => $model,
+                'delay'     =>  $day * 86400000 ,
+            ]);
             // 发起微信支付
             return $this->renderSuccess([
                 'payment'  => $this->wxPay($model['order_no'], $this->user['open_id']
@@ -86,17 +79,6 @@ class Order extends Controller
         return $this->renderError($error);
     }
 
-    public static function pushOrderMegToMQ($data, $delay = 0, $retryTime = 0)
-    {
-
-        $values = SettingModel::getItem('trade');
-        $day    = isset($values['order']['close_days']) ? intval($values['order']['close_days']) : 2;
-        RabbitMQ::instance()->push([
-            'data'      => $data,
-            'delay'     => $delay === 0 ? $day * 86400000 : $delay,
-            'retryTime' => $retryTime,
-        ]);
-    }
     /**
      * 订单确认-购物车结算
      * @return array
@@ -141,18 +123,18 @@ class Order extends Controller
     {
         $orderList = [];
         try {
-            $canWrite = $this->request->get('canWrite',false);
-            $connected = $this->request->get('connected',false);
-            Log::info('canWrite=>'.$canWrite);
-            Log::info('connected=>'.$connected);
+            $canWrite  = $this->request->get('canWrite', false);
+            $connected = $this->request->get('connected', false);
+            Log::info('canWrite=>' . $canWrite);
+            Log::info('connected=>' . $connected);
             if (!$canWrite || $canWrite == 'false' || !$connected || $connected == 'false') {
                 return $this->renderSuccess($orderList);
             }
 
-            $model      = new OrderModel;
+            $model   = new OrderModel;
             $orderNo = $model->findPrintOrderNoOrCreate();
-            if ($orderNo){
-                $order      = $model->where('order_no', '=', $orderNo)->limit(1)->field(['order_id'])->find();
+            if ($orderNo) {
+                $order = $model->where('order_no', '=', $orderNo)->limit(1)->field(['order_id'])->find();
                 if (isset($order->order_id) && !empty($order->order_id)) {
                     $orderList[] = OrderModel::detail($order->order_id);
                 }

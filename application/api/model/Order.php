@@ -135,7 +135,6 @@ class Order extends OrderModel
             'wxapp_id'            => self::$wxapp_id,
             'order_no'            => $this->orderNo(),
             'total_price'         => $order['order_total_price'],
-            'use_balance'         => isset($order['use_balance']) ? $order['use_balance'] : 0,
             'pay_price'           => $order['order_pay_price'],
             'express_price'       => $order['express_price'],
             'claim_delivery_time' => $day,
@@ -144,7 +143,6 @@ class Order extends OrderModel
         ];
         // 记录订单信息
         $this->save($orderInfo);
-        $this->consumerBalance($user_id, $orderInfo['use_balance'], $orderInfo['order_no']);
         // 订单商品列表
         $goodsList = [];
         // 更新商品库存 (下单减库存)
