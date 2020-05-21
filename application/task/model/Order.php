@@ -51,7 +51,10 @@ class Order extends OrderModel
                 'delivery_time'   => time(),
             ]);
         }
-        if ($userBalance) $this->consumerBalance($this['user_id'], $this['pay_price'], $this['order_no']);
+        if ($userBalance) {
+            $data['use_balance'] = $this['pay_price'];
+            $this->consumerBalance($this['user_id'], $this['pay_price'], $this['order_no']);
+        }
 
         $this->save($data);
         Db::commit();
