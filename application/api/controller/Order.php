@@ -60,13 +60,7 @@ class Order extends Controller
 
         // 创建订单
         if ($model->add($this->user['user_id'], $order)) {
-
-            $values = SettingModel::getItem('trade');
-            $day    = isset($values['order']['close_days']) ? intval($values['order']['close_days']) : 0;
-            NotifyService::pushOrderMegToMQ([
-                'data'      => $model,
-                'delay'     =>  $day * 86400000 ,
-            ]);
+            NotifyService::pushOrderMegToMQ($model, 'trade.order.close_days');
             // 发起微信支付
             return $this->renderSuccess([
                 'payment'  => $this->wxPay($model['order_no'], $this->user['open_id']

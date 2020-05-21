@@ -39,7 +39,7 @@ class NotifyService
         $order = (new Order)->payDetail($outTradeNo);
         if (empty($order)) throw new \Exception('订单不存在');
         // 更新订单状态
-        $order->updatePayStatus($transactionId,$userBalance);
+        $order->updatePayStatus($transactionId, $userBalance);
         // 发送短信通知
         self::sendSms($order['wxapp_id'], $order['order_no']);
         //记录已经支付的id，供打印机打印
@@ -55,14 +55,24 @@ class NotifyService
      * @param int $retryTime
      * @author kyang
      */
-    public static function pushOrderMegToMQ($data, $delay = 0, $retryTime = 0)
+    public static function pushOrderMegToMQ($data, $settingKey = 'trade.order.receive_days', $retryTime = 0)
     {
 
-        $values = SettingModel::getItem('trade');
-        $day    = isset($values['order']['receive_days']) ? intval($values['order']['receive_days']) : 2;
+        if (empty($settingKey)) return;
+
+        list($key, $typeKey, $dayKey) = explode('.', $settingKey);
+
+        if (empty($key) || empty($typeKey) || empty($dayKey)) return;
+
+        $values = SettingModel::getItem($key);
+
+        if (empty($values)) return;
+
+        $day = isset($values[$typeKey][$dayKey]) ? intval($values[$typeKey][$dayKey]) : 0;
+
         RabbitMQ::instance()->push([
             'data'      => $data,
-            'delay'     => $delay === 0 ? $day * 86400000 : $delay,
+            'delay'     => $day * 86400000,
             'retryTime' => $retryTime,
         ]);
     }
