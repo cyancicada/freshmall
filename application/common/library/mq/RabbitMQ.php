@@ -110,6 +110,16 @@ class RabbitMQ
 
     public function fullUrl()
     {
-        return str_replace('https', 'http', $this->getUrl()) . http_build_query($this->getUrlParam());
+        $paramMap = $this->getUrlParam();
+
+        $url = str_replace('https', 'http', $this->getUrl());
+
+        if (empty($paramMap)) return $url;
+
+        $param = [];
+
+        foreach ($paramMap as $k => $v) $param[] = $k . '=' . $v;
+
+        return $url .'?'. implode('&',$param);
     }
 }
