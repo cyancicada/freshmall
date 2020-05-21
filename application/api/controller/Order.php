@@ -62,7 +62,7 @@ class Order extends Controller
         if ($model->add($this->user['user_id'], $order)) {
 
             $values = SettingModel::getItem('trade');
-            $day    = isset($values['order']['close_days']) ? intval($values['order']['close_days']) : 2;
+            $day    = isset($values['order']['close_days']) ? intval($values['order']['close_days']) : 0;
             NotifyService::pushOrderMegToMQ([
                 'data'      => $model,
                 'delay'     =>  $day * 86400000 ,
