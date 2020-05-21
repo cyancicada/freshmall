@@ -31,7 +31,7 @@ class RabbitMQ
     /**
      * @param string $url
      */
-    public function setUrl(string $url): void
+    public function setUrl($url): void
     {
         if (empty($url)) $url = base_url() . 'notice.php';
         $this->url = $url;
