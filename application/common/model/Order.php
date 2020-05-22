@@ -71,11 +71,13 @@ class Order extends BaseModel
         if (floatval($balance) <= 0) return false;
 
         $filter = ['user_id' => $userId, 'wxapp_id' => self::$wxapp_id];
-        $b      = Balance::get($filter);
-        if (empty($b)) $b = Balance::create($filter);
+
+        $balanceModel      = Balance::get($filter);
+        if (empty($balanceModel)) $balanceModel = Balance::create(array_merge($filter,['balance'=>0]));
 
         if ($refund) {
-            $b->setInc('balance', $balance);
+            $balanceModel->setInc('balance', $balance);
+
             return (new BalanceDetail)->save([
                 'user_id'        => $userId,
                 'wxapp_id'       => self::$wxapp_id,
@@ -88,7 +90,7 @@ class Order extends BaseModel
             ]);
         }
 
-        $b->setDec('balance', $balance);
+        $balanceModel->setDec('balance', $balance);
         return (new BalanceDetail)->save([
             'user_id'        => $userId,
             'wxapp_id'       => self::$wxapp_id,
