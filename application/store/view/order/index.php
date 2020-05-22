@@ -113,7 +113,7 @@
 
                                                     <?php if ($order['pay_status']['value'] == 20 &&
                                                         $order['is_refund'] == 'N' &&
-                                                        in_array($order['order_status']['value'],[10])): ?>
+                                                        in_array($order['order_status']['value'],[10,30])): ?>
                                                         <a class="tpl-table-black-operation"
                                                            onclick="refundEvent('<?= $order['order_no'] ?>','<?= $order['pay_price'] ?>')"
                                                            href="javascript:void(0) ;">
