@@ -32,7 +32,7 @@ class Balance extends BaseModel
      * @param $user_id
      * @throws \Exception
      */
-    public function myBalance($user_id, $onlyBalance = false)
+    public static function myBalance($user_id, $onlyBalance = false)
     {
         try {
             $response = ['balance' => 0.00];
