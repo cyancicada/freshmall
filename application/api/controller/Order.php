@@ -63,7 +63,7 @@ class Order extends Controller
             if ($this->request->post('use_balance')) {
                 try {
                     NotifyService::updateOrder($model['order_no'], BalanceModel::buildTradeNo($this->user['user_id']), true);
-                    return $this->renderSuccess([], '支付成功');
+                    return $this->renderSuccess($model, '支付成功');
                 } catch (\Exception $exception) {
                     $m = $exception->getCode() == 1 ? $exception->getMessage():'支付失败';
                     return $this->renderError($m);
@@ -111,7 +111,7 @@ class Order extends Controller
             if ($this->request->post('use_balance')) {
                 try {
                     NotifyService::updateOrder($model['order_no'], BalanceModel::buildTradeNo($this->user['user_id']), true);
-                    return $this->renderSuccess([], '支付成功');
+                    return $this->renderSuccess($model, '支付成功');
                 } catch (\Exception $exception) {
                     $m = $exception->getCode() == 1 ? $exception->getMessage():'支付失败';
                     return $this->renderError($m);
