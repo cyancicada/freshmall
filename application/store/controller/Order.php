@@ -191,6 +191,8 @@ class Order extends Controller
             $order = OrderModel::get(['order_no' => $orderNo]);
             if (empty($order)) return $this->renderError('订单不存在');
 
+            if ($order['is_refund'] == 'Y') return $this->renderError('此订单已退款，勿重复操作！！！' );
+
             if (floatval($amount) > floatval($order['pay_price'])) {
                 return $this->renderError('最高可退金额不可超过订单支付金额：' . $order['pay_price']);
             }
