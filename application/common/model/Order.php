@@ -86,7 +86,7 @@ class Order extends BaseModel
                 'latest_balance' => Balance::myBalance($userId, true),
                 'trade_no'       => Balance::buildTradeNo(),
                 'type'           => Balance::TYPE_REFUND,
-                'mark'           => $mark ? $mark : '订单退款：' . $orderNo,
+                'mark'           => $mark ? $mark : '订单退款到余额-' . $orderNo,
             ]);
         }
 
@@ -99,7 +99,7 @@ class Order extends BaseModel
             'latest_balance' => Balance::myBalance($userId, true),
             'trade_no'       => Balance::buildTradeNo(),
             'type'           => Balance::TYPE_CONSUMER,
-            'mark'           => $mark ? $mark : '订单支付：' . $orderNo,
+            'mark'           => $mark ? $mark : '使用余额支付订单-' . $orderNo,
         ]);
     }
 
