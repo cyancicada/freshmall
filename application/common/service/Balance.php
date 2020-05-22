@@ -61,7 +61,7 @@ class Balance
             $filter = ['trade_no' => $data['out_trade_no'], 'trade_status' => 'UNFINISHED'];
             $row    = BalanceDetail::get($filter);
 
-            if (empty($row)) throw new \Exception('记录不存在');
+            if (empty($row)) throw new \Exception('充值记录不存在');
             Db::startTrans();
             $balanceModel = new BalanceModel;
             $userFilter   = ['user_id' => $row['user_id']];
