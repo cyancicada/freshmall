@@ -27,4 +27,23 @@ class Balance extends BaseModel
     {
         return 'B' . $user_id . date('YmdHis');
     }
+
+    /** 我的余额
+     * @param $user_id
+     * @throws \Exception
+     */
+    public function myBalance($user_id, $onlyBalance = false)
+    {
+        try {
+            $response = ['balance' => 0.00];
+            $balance  = self::get(['user_id' => $user_id]);
+
+            if (!empty($balance)) $response['balance'] = round($balance['balance'],2);
+
+            return $onlyBalance ? round($response['balance'],2) : $response;
+        } catch (\Exception $exception) {
+            throw new \Exception('获取余额失败');
+        }
+
+    }
 }

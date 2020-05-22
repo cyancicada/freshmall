@@ -99,16 +99,7 @@ class Balance
      */
     public function myBalance($user_id, $onlyBalance = false)
     {
-        try {
-            $response = ['balance' => '0.00'];
-            $balance  = BalanceModel::get(['user_id' => $user_id]);
-            if (!empty($balance)) $response['balance'] = $balance['balance'];
-
-            return $onlyBalance ? round($response['balance'],2) : $response;
-        } catch (\Exception $exception) {
-            throw new \Exception('获取余额失败');
-        }
-
+        return BalanceModel::myBalance($user_id, $onlyBalance);
     }
 
     /** 我的余额

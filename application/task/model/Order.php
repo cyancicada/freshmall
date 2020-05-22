@@ -2,6 +2,7 @@
 
 namespace app\task\model;
 
+use app\common\model\Balance;
 use app\common\model\DeliveryRule;
 use app\common\model\Order as OrderModel;
 use think\Db;
@@ -53,6 +54,9 @@ class Order extends OrderModel
         }
         if ($userBalance) {
             $data['use_balance'] = $this['pay_price'];
+
+            $myBalance = Balance::myBalance($this['user_id'], true);
+            if ($myBalance < $this['pay_price']) throw new \Exception('余额不足');
             $this->consumerBalance($this['user_id'], $this['pay_price'], $this['order_no']);
         }
 
