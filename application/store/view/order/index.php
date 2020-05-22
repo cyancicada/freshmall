@@ -197,7 +197,9 @@
           dataType: "json",
           success: function (r) {
             layer.msg(r.msg);
-            return  r.code !== 1;
+            if (r.code === 1){
+              window.location.reload();
+            }
           } // 注意不要在此行增加逗号
         });
         return false;
