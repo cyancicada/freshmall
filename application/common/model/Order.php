@@ -64,37 +64,40 @@ class Order extends BaseModel
      * @param $balance
      * @param $orderNo
      * @return bool|false|int
-     * @throws \think\Exception
-     * @throws \think\exception\DbException
+     * @throws \Exception
      */
-    public function consumerBalance($userId, $balance, $orderNo, $refund = false)
+    public function consumerBalance($userId, $balance, $orderNo, $mark = '', $refund = false)
     {
         if (floatval($balance) <= 0) return false;
 
-        $b = Balance::get(['user_id' => $userId, 'wxapp_id' => self::$wxapp_id]);
-        if (empty($b)) return false;
+        $filter = ['user_id' => $userId, 'wxapp_id' => self::$wxapp_id];
+        $b      = Balance::get($filter);
+        if (empty($b)) $b = Balance::create($filter);
+
         if ($refund) {
             $b->setInc('balance', $balance);
             return (new BalanceDetail)->save([
-                'user_id'      => $userId,
-                'wxapp_id'     => self::$wxapp_id,
-                'balance'      => $balance,
-                'trade_status' => 'FINISHED',
-                'trade_no'     => Balance::buildTradeNo($userId),
-                'type'         => Balance::TYPE_REFUND,
-                'mark'         => '取消订单：' . $orderNo,
+                'user_id'        => $userId,
+                'wxapp_id'       => self::$wxapp_id,
+                'balance'        => $balance,
+                'trade_status'   => 'FINISHED',
+                'latest_balance' => Balance::myBalance($userId, true),
+                'trade_no'       => Balance::buildTradeNo($userId),
+                'type'           => Balance::TYPE_REFUND,
+                'mark'           => $mark ? $mark : '订单退款：' . $orderNo,
             ]);
         }
 
         $b->setDec('balance', $balance);
         return (new BalanceDetail)->save([
-            'user_id'      => $userId,
-            'wxapp_id'     => self::$wxapp_id,
-            'balance'      => '-' . $balance,
-            'trade_status' => 'FINISHED',
-            'trade_no'     => Balance::buildTradeNo($userId),
-            'type'         => Balance::TYPE_CONSUMER,
-            'mark'         => '支付订单：' . $orderNo,
+            'user_id'        => $userId,
+            'wxapp_id'       => self::$wxapp_id,
+            'balance'        => '-' . $balance,
+            'trade_status'   => 'FINISHED',
+            'latest_balance' => Balance::myBalance($userId, true),
+            'trade_no'       => Balance::buildTradeNo($userId),
+            'type'           => Balance::TYPE_CONSUMER,
+            'mark'           => $mark ? $mark : '订单支付：' . $orderNo,
         ]);
     }
 

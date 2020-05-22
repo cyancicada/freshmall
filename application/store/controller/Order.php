@@ -2,10 +2,8 @@
 
 namespace app\store\controller;
 
-use app\api\model\Goods as GoodsModel;
 use app\common\model\BaseModel;
 use app\store\model\Order as OrderModel;
-use think\cache\driver\Redis;
 use app\store\model\User;
 
 /**
@@ -176,5 +174,37 @@ class Order extends Controller
             return $this->renderSuccess();
         }
         return $this->fetch('print');
+    }
+    /** 订单打印
+     * @param null $order_id
+     * @return array
+     * @throws \think\exception\DbException
+     */
+    public function refund()
+    {
+        if ($this->request->isPost()) {
+            $orderNo = $this->request->post('orderNo');
+            $amount  = $this->request->post('amount');
+            $mark    = $this->request->post('mark');
+
+
+            $order = OrderModel::get(['order_no' => $orderNo]);
+            if (empty($order)) return $this->renderError('订单不存在');
+
+            if (floatval($amount) > floatval($order['pay_price'])) {
+                return $this->renderError('最高可退金额不可超过订单支付金额：' . $order['pay_price']);
+            }
+            try {
+                $order->startTrans();
+                $order->consumerBalance($order['user_id'], $amount, $orderNo, $mark, true);
+                $order->save(['is_refund' => 'Y']);
+                $order->commit();
+                return $this->renderSuccess('退款成功');
+            } catch (\Exception $exception) {
+                $order->rollback();
+                return $this->renderError('退款失败：' . $exception->getMessage());
+            }
+        }
+        return $this->renderError();
     }
 }

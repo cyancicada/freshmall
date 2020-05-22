@@ -98,6 +98,7 @@
                                                 </p>
                                             </td>
                                             <td class="am-text-middle" rowspan="<?= $goodsCount ?>">
+
                                                 <div class="tpl-table-black-operation">
                                                     <a class="tpl-table-black-operation-green"
                                                        href="<?= url('order/detail', ['order_id' => $order['order_id']]) ?>">
@@ -108,6 +109,15 @@
                                                            href="<?= url('order/detail#delivery',
                                                                ['order_id' => $order['order_id']]) ?>">
                                                             去发货</a>
+                                                    <?php endif; ?>
+
+                                                    <?php if ($order['pay_status']['value'] == 20 &&
+                                                        $order['is_refund'] == 'N' &&
+                                                        in_array($order['order_status']['value'],[10])): ?>
+                                                        <a class="tpl-table-black-operation"
+                                                           onclick="refundEvent('<?= $order['order_no'] ?>','<?= $order['pay_price'] ?>')"
+                                                           href="javascript:void(0) ;">
+                                                            退款</a>
                                                     <?php endif; ?>
                                                 </div>
                                             </td>
@@ -133,5 +143,70 @@
         </div>
     </div>
 </div>
+
+<script>
+
+  var url = 'index.php?s=store/order/refund';
+
+  function refundEvent(orderNo, refundAmount) {
+    var html = '    <form class="my-form am-form tpl-form-line-form" method="post">' +
+      '        <div class="am-form-group">' +
+      '            <label class="am-u-sm-3 am-u-lg-2 am-form-label form-require">退款订单号 </label>' +
+      '            <div class="am-u-sm-9 am-u-end">' +
+      '                <input type="text" id="refund_order_no" value="' + orderNo + '" readonly' +
+      '                       class="tpl-form-input" name="refund[order_no]"' +
+      '                       required>' +
+      '            </div>' +
+      '        </div>' +
+      '        <div class="am-form-group">' +
+      '            <label class="am-u-sm-3 am-u-lg-2 am-form-label form-require">最高可退金额 </label>' +
+      '            <div class="am-u-sm-9 am-u-end">' +
+      '                <input type="number" id="refund_amount" max="' + refundAmount + '" value="' + refundAmount + '"' +
+      '                       class="tpl-form-input" name="refund[amount]" required>' +
+      '            </div>' +
+      '        </div>' +
+      '        <div class="am-form-group">' +
+      '            <label class="am-u-sm-3 am-u-lg-2 am-form-label">备注 </label>' +
+      '            <div class="am-u-sm-9 am-u-end">' +
+      '                <input type="text" id="refund_mark" value="" class="tpl-form-input" name="refund[mark]">' +
+      '            </div>' +
+      '        </div>' +
+      '    </form>';
+    layer.open({
+      area: ['500px', '350px'],
+      btn: ['确定', '取消'],
+      content: html
+      , yes: function (index, layero) {
+        let amount = parseFloat($('#refund_amount').val());
+        if (amount > parseFloat(refundAmount)) {
+          layer.msg('最高可退金额不可超过订单支付金额：' + refundAmount);
+          return true;
+        }
+        var param = {
+          orderNo: orderNo,
+          amount: amount,
+          mark: $('#refund_mark').val(),
+        };
+        console.log(param);
+        $.ajax({
+          type: "post",
+          url: url,
+          async: true,
+          data: JSON.stringify(param),
+          contentType: "application/json; charset=utf-8",
+          dataType: "json",
+          success: function (r) {
+            layer.msg(r.msg);
+            return  r.code !== 1;
+          } // 注意不要在此行增加逗号
+        });
+        return false;
+      }
+      , btn2: function () {
+
+      }
+    });
+  }
+</script>
 
 
