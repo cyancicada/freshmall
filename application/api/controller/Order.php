@@ -65,7 +65,8 @@ class Order extends Controller
                     NotifyService::updateOrder($model['order_no'], BalanceModel::buildTradeNo($this->user['user_id']), true);
                     return $this->renderSuccess([], '支付成功');
                 } catch (\Exception $exception) {
-                    return $this->renderError('支付失败');
+                    $m = $exception->getCode() == 1 ? $exception->getMessage():'支付失败';
+                    return $this->renderError($m);
                 }
             }
             // 发起微信支付
@@ -112,7 +113,8 @@ class Order extends Controller
                     NotifyService::updateOrder($model['order_no'], BalanceModel::buildTradeNo($this->user['user_id']), true);
                     return $this->renderSuccess([], '支付成功');
                 } catch (\Exception $exception) {
-                    return $this->renderError('支付失败');
+                    $m = $exception->getCode() == 1 ? $exception->getMessage():'支付失败';
+                    return $this->renderError($m);
                 }
             }
 

@@ -56,7 +56,7 @@ class Order extends OrderModel
             $data['use_balance'] = $this['pay_price'];
 
             $myBalance = Balance::myBalance($this['user_id'], true);
-            if ($myBalance < $this['pay_price']) throw new \Exception('余额不足');
+            if ($myBalance < $this['pay_price']) throw new \Exception('余额不足',1);
             $this->consumerBalance($this['user_id'], $this['pay_price'], $this['order_no']);
         }
 

@@ -98,7 +98,8 @@ class Balance extends Controller
             NotifyService::updateOrder($order['order_no'], BalanceModel::buildTradeNo($this->user['user_id']), true);
             return $this->renderSuccess();
         } catch (\Exception $exception) {
-            return $this->renderError('支付失败');
+            $m = $exception->getCode() == 1 ? $exception->getMessage():'支付失败';
+            return $this->renderError($m);
         }
 
     }
