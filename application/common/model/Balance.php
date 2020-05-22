@@ -27,7 +27,7 @@ class Balance extends BaseModel
 
     public static function buildTradeNo()
     {
-        return 'B' . date('m') . SnowFlake::nextId();
+        return 'B' . date('Ymd') . SnowFlake::nextId();
     }
 
     /** 我的余额
