@@ -2,6 +2,8 @@
 
 namespace app\common\model;
 
+use app\common\library\utils\SnowFlake;
+
 /**
  * 商品分类模型
  * Class Category
@@ -23,9 +25,9 @@ class Balance extends BaseModel
     ];
 
 
-    public static function buildTradeNo($user_id = '')
+    public static function buildTradeNo()
     {
-        return 'B' . $user_id . date('YmdHis');
+        return 'B' . date('YmdHis') . SnowFlake::nextId();
     }
 
     /** 我的余额
@@ -38,9 +40,9 @@ class Balance extends BaseModel
             $response = ['balance' => 0.00];
             $balance  = self::get(['user_id' => $user_id]);
 
-            if (!empty($balance)) $response['balance'] = round($balance['balance'],2);
+            if (!empty($balance)) $response['balance'] = round($balance['balance'], 2);
 
-            return $onlyBalance ? round($response['balance'],2) : $response;
+            return $onlyBalance ? round($response['balance'], 2) : $response;
         } catch (\Exception $exception) {
             throw new \Exception('获取余额失败');
         }

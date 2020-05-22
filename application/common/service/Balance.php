@@ -28,7 +28,7 @@ class Balance
         $balanceModel = new BalanceModel;
         try {
             Db::startTrans();
-            $tradeNo = BalanceModel::buildTradeNo($user_id);
+            $tradeNo = BalanceModel::buildTradeNo();
             (new BalanceDetail)->save([
                 'user_id'  => $user_id,
                 'wxapp_id' => $balanceModel::$wxapp_id,

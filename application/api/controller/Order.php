@@ -62,7 +62,7 @@ class Order extends Controller
             // 如果 使用余额支付的
             if ($this->request->post('use_balance')) {
                 try {
-                    NotifyService::updateOrder($model['order_no'], BalanceModel::buildTradeNo($this->user['user_id']), true);
+                    NotifyService::updateOrder($model['order_no'], BalanceModel::buildTradeNo(), true);
                     return $this->renderSuccess($model, '支付成功');
                 } catch (\Exception $exception) {
                     $m = $exception->getCode() == 1 ? $exception->getMessage():'支付失败';
@@ -110,7 +110,7 @@ class Order extends Controller
             // 如果 使用余额支付的
             if ($this->request->post('use_balance')) {
                 try {
-                    NotifyService::updateOrder($model['order_no'], BalanceModel::buildTradeNo($this->user['user_id']), true);
+                    NotifyService::updateOrder($model['order_no'], BalanceModel::buildTradeNo(), true);
                     return $this->renderSuccess($model, '支付成功');
                 } catch (\Exception $exception) {
                     $m = $exception->getCode() == 1 ? $exception->getMessage():'支付失败';

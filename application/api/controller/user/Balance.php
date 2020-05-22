@@ -95,7 +95,7 @@ class Balance extends Controller
         OrderModel::updateClaimDeliveryTime($order_id, $delivery_time);
         // 支付
         try {
-            NotifyService::updateOrder($order['order_no'], BalanceModel::buildTradeNo($this->user['user_id']), true);
+            NotifyService::updateOrder($order['order_no'], BalanceModel::buildTradeNo(), true);
             return $this->renderSuccess();
         } catch (\Exception $exception) {
             $m = $exception->getCode() == 1 ? $exception->getMessage():'支付失败';
