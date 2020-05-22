@@ -2,13 +2,11 @@
 
 namespace app\api\controller;
 
+use app\api\model\Cart as CartModel;
 use app\api\model\Order as OrderModel;
 use app\api\model\Wxapp as WxappModel;
-use app\api\model\Cart as CartModel;
-use app\common\library\mq\RabbitMQ;
 use app\common\library\wechat\WxPay;
-use app\common\service\Balance;
-use app\task\model\Setting as SettingModel;
+use app\common\model\Balance as BalanceModel;
 use app\task\service\NotifyService;
 use think\Log;
 
@@ -61,6 +59,15 @@ class Order extends Controller
         // 创建订单
         if ($model->add($this->user['user_id'], $order)) {
             NotifyService::pushOrderMegToMQ($model, 'trade.order.close_days');
+            // 如果 使用余额支付的
+            if ($this->request->post('use_balance')) {
+                try {
+                    NotifyService::updateOrder($model['order_no'], BalanceModel::buildTradeNo($this->user['user_id']), true);
+                    return $this->renderSuccess([], '支付成功');
+                } catch (\Exception $exception) {
+                    return $this->renderError('支付失败');
+                }
+            }
             // 发起微信支付
             return $this->renderSuccess([
                 'payment'  => $this->wxPay($model['order_no'], $this->user['open_id']
@@ -72,6 +79,7 @@ class Order extends Controller
         $error = $model->getError() ?: '订单创建失败';
         return $this->renderError($error);
     }
+
 
     /**
      * 订单确认-购物车结算
@@ -98,6 +106,16 @@ class Order extends Controller
             // 清空购物车
             $Card = new CartModel($this->user['user_id']);
             $Card->clearAll();
+            // 如果 使用余额支付的
+            if ($this->request->post('use_balance')) {
+                try {
+                    NotifyService::updateOrder($model['order_no'], BalanceModel::buildTradeNo($this->user['user_id']), true);
+                    return $this->renderSuccess([], '支付成功');
+                } catch (\Exception $exception) {
+                    return $this->renderError('支付失败');
+                }
+            }
+
             // 发起微信支付
             return $this->renderSuccess([
                 'payment'  => $this->wxPay($model['order_no'], $this->user['open_id']

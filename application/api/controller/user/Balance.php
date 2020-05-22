@@ -7,6 +7,8 @@ use app\api\model\Order as OrderModel;
 use app\common\service\Balance as BalanceService;
 use app\task\service\NotifyService;
 
+use app\common\model\Balance as BalanceModel;
+
 /**
  * 全额中心主页
  * Class Index
@@ -88,13 +90,12 @@ class Balance extends Controller
         // 订单详情
         $order = OrderModel::getUserOrderDetail($order_id, $this->user['user_id']);
         // 判断商品状态、库存
-        if (!$order->checkGoodsStatusFromOrder($order['goods'])) {
-            return $this->renderError($order->getError());
-        }
+        if (!$order->checkGoodsStatusFromOrder($order['goods'])) return $this->renderError($order->getError());
+
         OrderModel::updateClaimDeliveryTime($order_id, $delivery_time);
         // 支付
         try {
-            NotifyService::updateOrder($order['order_no'], $order['transaction_id'], true);
+            NotifyService::updateOrder($order['order_no'], BalanceModel::buildTradeNo($this->user['user_id']), true);
             return $this->renderSuccess();
         } catch (\Exception $exception) {
             return $this->renderError('支付失败');
