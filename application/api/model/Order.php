@@ -250,8 +250,6 @@ class Order extends OrderModel
             DB::startTrans();
             // 回退商品库存
             $this->backGoodsStock($this['goods']);
-            // 退回余额
-            $this->consumerBalance($this['user_id'], $this['use_balance'], $this['order_no'], true);
             $this->save(['order_status' => 20]);
             DB::commit();
             return true;
