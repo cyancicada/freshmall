@@ -62,18 +62,18 @@ class Balance
         $today       = date('Y-m-d H:i:s');
         $values      = SettingModel::getItem('charge');
 
-        Log::info(var_export($values,true));
+        Log::info('charge==>'.json_encode($values));
         if (empty($values)) return $extraAmount;
 
         if (!isset($values['time_range'])) return $extraAmount;
 
-        Log::info('time_range'.$values['time_range']);
+        Log::info('charge==>time_range'.$values['time_range']);
 
         list($start, $end) = explode(' ~ ', $values['time_range']);
         unset($values['time_range']);
-        Log::info('$start='.$start);
-        Log::info('$end='.$end);
-        Log::info('$today='.$today);
+        Log::info('charge==>$start='.$start);
+        Log::info('charge==>$end='.$end);
+        Log::info('charge==>$today='.$today);
         if ($today >= $start && $today <= $end) {
             foreach ($values as $item) {
 
