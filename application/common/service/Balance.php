@@ -39,9 +39,8 @@ class Balance
                 'mark'     => $mark,
             ]);
             if ($type == BalanceModel::TYPE_RECHARGE) {
-                $wxConfig = WxappModel::getWxappCache();
-                $WxPay    = new WxPay($wxConfig);
-                $data     = $WxPay->unifiedorder($tradeNo, $open_id, $balance);
+
+                $data     = (new WxPay(WxappModel::getWxappCache()))->unifiedorder($tradeNo, $open_id, $balance);
             }
             Db::commit();
             return $data;
