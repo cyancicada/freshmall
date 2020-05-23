@@ -193,7 +193,7 @@ class WxPay
                 && ($data['return_code'] == 'SUCCESS')
                 && ($data['result_code'] == 'SUCCESS')) {
                 // 更新订单状态
-                (new Balance())->writeBalance($data);
+                (new Balance)->chargeBalance($data);
                 // 返回状态
                 $this->returnCode(true, 'OK');
             }

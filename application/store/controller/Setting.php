@@ -85,6 +85,15 @@ class Setting extends Controller
     {
         return $this->updateEvent('storage');
     }
+    /**
+     * 上传设置
+     * @return mixed
+     * @throws \think\exception\DbException
+     */
+    public function charge()
+    {
+        return $this->updateEvent('charge');
+    }
 
     /**
      * 更新商城设置事件

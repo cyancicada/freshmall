@@ -131,15 +131,24 @@
 <script src="assets/store/js/file.library.js"></script>
 </body>
 <script>
-    //常规用法
-    laydate.render({
-        elem: '#date_seletor'
-    });
-    //常规用法
-    laydate.render({
-        elem: '.date_range_seletor',
-        range: '~'
-    });
+
+   $(function () {
+       //常规用法
+       laydate.render({
+           elem: '#date_seletor'
+       });
+       //常规用法
+       laydate.render({
+           elem: '.date_range_seletor',
+           range: '~'
+       });
+       //日期时间范围
+       laydate.render({
+           elem: '.time_range_selector'
+           , type: 'datetime'
+           , range: '~'
+       });
+   });
 </script>
 
 </html>

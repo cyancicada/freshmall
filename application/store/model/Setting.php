@@ -17,10 +17,11 @@ class Setting extends SettingModel
      * @var array
      */
     private $describe = [
-        'sms' => '短信通知',
+        'sms'     => '短信通知',
         'storage' => '上传设置',
-        'store' => '商城设置',
-        'trade' => '交易设置',
+        'store'   => '商城设置',
+        'trade'   => '交易设置',
+        'charge'  => '充值设置',
     ];
 
     /**
@@ -36,11 +37,11 @@ class Setting extends SettingModel
         // 删除系统设置缓存
         Cache::rm('setting_' . self::$wxapp_id);
         return $model->save([
-            'key' => $key,
-            'describe' => $this->describe[$key],
-            'values' => $values,
-            'wxapp_id' => self::$wxapp_id,
-        ]) !== false;
+                'key'      => $key,
+                'describe' => $this->describe[$key],
+                'values'   => $values,
+                'wxapp_id' => self::$wxapp_id,
+            ]) !== false;
     }
 
 }

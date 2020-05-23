@@ -193,7 +193,12 @@ return [
                         'index' => 'setting.science/index'
                     ],
                 ]
-            ]
+            ],
+
+            [
+                'name' => '充值设置',
+                'index' => 'setting/charge',
+            ],
         ],
     ],
 ];
