@@ -75,7 +75,7 @@ class Balance
 
                 $amount  = floatval($item['amount']);
                 $freeGet = floatval($item['free_get']);
-                if ($amount <= 0 || $freeGet <= $freeGet) continue;
+                if ($amount <= 0 || $freeGet <= 0) continue;
 
                 if ($chargeAmount >= $amount) $extraAmount = $freeGet;
             }
