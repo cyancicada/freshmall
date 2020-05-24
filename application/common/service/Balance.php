@@ -40,7 +40,7 @@ class Balance
             ]);
             if ($type == BalanceModel::TYPE_RECHARGE) {
 
-                $data     = (new WxPay(WxappModel::getWxappCache()))->unifiedorder($tradeNo, $open_id, $balance);
+                $data = (new WxPay(WxappModel::getWxappCache()))->unifiedorder($tradeNo, $open_id, $balance);
             }
             Db::commit();
             return $data;
@@ -73,7 +73,11 @@ class Balance
 
             foreach ($values as $item) {
 
-                if ($chargeAmount >= floatval($item['amount'])) $extraAmount = floatval($item['free_get']);
+                $amount  = floatval($item['amount']);
+                $freeGet = floatval($item['free_get']);
+                if ($amount <= 0 || $freeGet <= $freeGet) continue;
+
+                if ($chargeAmount >= $amount) $extraAmount = $freeGet;
             }
         }
         return $extraAmount;
@@ -93,7 +97,7 @@ class Balance
             $chargeAmount = floatval($row['balance']);
             if ($chargeAmount <= 0) throw new \Exception('充值金额不正确：' . $data['out_trade_no']);
 
-            $extraAmount = self::extraAmount($chargeAmount);
+            $extraAmount  = self::extraAmount($chargeAmount);
             $chargeAmount += $extraAmount;
 
             Db::startTrans();
