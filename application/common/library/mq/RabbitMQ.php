@@ -102,8 +102,7 @@ class RabbitMQ
         }
 
         $array['url'] = $this->fullUrl();
-        self::$instance->getChannel()
-            ->basic_publish(new AMQPMessage(json_encode($array)), '', $this->queueName);
+        self::$instance->getChannel()->basic_publish(new AMQPMessage(json_encode($array)), '', $this->queueName);
 
         return true;
     }

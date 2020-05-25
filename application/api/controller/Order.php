@@ -58,7 +58,6 @@ class Order extends Controller
 
         // 创建订单
         if ($model->add($this->user['user_id'], $order)) {
-            NotifyService::pushOrderMegToMQ($model, 'trade.order.close_days');
             // 如果 使用余额支付的
             if ($this->request->post('use_balance')) {
                 try {
@@ -69,6 +68,7 @@ class Order extends Controller
                     return $this->renderError($m);
                 }
             }
+            NotifyService::pushOrderMegToMQ($model, 'trade.order.close_days',['s'=>'']);
             // 发起微信支付
             return $this->renderSuccess([
                 'payment'  => $this->wxPay($model['order_no'], $this->user['open_id']

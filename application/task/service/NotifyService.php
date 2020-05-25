@@ -57,18 +57,16 @@ class NotifyService
      */
     public static function pushOrderMegToMQ($data, $settingKey = 'trade.order.receive_days', $extra = [], $retryTime = 0)
     {
+        $day = 0;
+        if (!empty($settingKey)) {
+            list($key, $typeKey, $dayKey) = explode('.', $settingKey);
 
-        if (empty($settingKey)) return;
+            $values = SettingModel::getItem($key);
 
-        list($key, $typeKey, $dayKey) = explode('.', $settingKey);
-
-        if (empty($key) || empty($typeKey) || empty($dayKey)) return;
-
-        $values = SettingModel::getItem($key);
-
-        if (empty($values)) return;
-
-        $day = isset($values[$typeKey][$dayKey]) ? intval($values[$typeKey][$dayKey]) : 0;
+            if (!empty($values)) {
+                $day = isset($values[$typeKey][$dayKey]) ? intval($values[$typeKey][$dayKey]) : 0;
+            }
+        }
 
         RabbitMQ::instance()->push(array_merge([
             'data'      => $data,
