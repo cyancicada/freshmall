@@ -69,10 +69,6 @@ class RabbitMQ
         if (Config::get('mq.password')) $this->password = Config::get('mq.password');
         if (Config::get('mq.queue_name')) $this->queueName = Config::get('mq.queue_name');
 
-        $this->setUrlParam([
-            's' => '/task/notify/mq',
-        ]);
-
         $this->setUrl(Config::get('mq.url'));
 
         $this->channel = (new AMQPStreamConnection($this->host, $this->post, $this->user, $this->password))
@@ -97,9 +93,9 @@ class RabbitMQ
     {
         if (empty($array)) return false;
 
-        if (isset($array['urlParam'])) {
-            $this->setUrlParam(array_merge($array['urlParam'], $this->getUrlParam()));
-        }
+        $this->setUrlParam(['s' => '/task/notify/mq']);
+
+        if (isset($array['path']) && empty($array['path'])) $this->setUrlParam(['s' => $array['path']]);
 
         $array['url'] = $this->fullUrl();
         self::$instance->getChannel()->basic_publish(new AMQPMessage(json_encode($array)), '', $this->queueName);

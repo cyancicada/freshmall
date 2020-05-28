@@ -68,7 +68,7 @@ class Order extends Controller
                     return $this->renderError($m);
                 }
             }
-            NotifyService::pushOrderMegToMQ($model, 'trade.order.close_days',['s'=>'']);
+            NotifyService::pushOrderMegToMQ($model, 'trade.order.close_days','/task/notify/cancel');
             // 发起微信支付
             return $this->renderSuccess([
                 'payment'  => $this->wxPay($model['order_no'], $this->user['open_id']

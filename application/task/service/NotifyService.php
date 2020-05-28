@@ -44,7 +44,8 @@ class NotifyService
         self::sendSms($order['wxapp_id'], $order['order_no']);
         //记录已经支付的id，供打印机打印
         $order->findPrintOrderNoOrCreate($order['order_no']);
-        self::pushOrderMegToMQ($order);
+
+        self::pushOrderMegToMQ($order, 'trade.order.receive_days', '/task/notify/receipt');
     }
 
 
@@ -55,7 +56,7 @@ class NotifyService
      * @param int $retryTime
      * @author kyang
      */
-    public static function pushOrderMegToMQ($data, $settingKey = 'trade.order.receive_days', $extra = [], $retryTime = 0)
+    public static function pushOrderMegToMQ($data, $settingKey, $path = '', $retryTime = 0)
     {
         $day = 0;
         if (!empty($settingKey)) {
@@ -68,10 +69,11 @@ class NotifyService
             }
         }
 
-        RabbitMQ::instance()->push(array_merge([
+        RabbitMQ::instance()->push([
             'data'      => $data,
             'delay'     => $day * 86400000,
             'retryTime' => $retryTime,
-        ], $extra));
+            'path'      => $path
+        ]);
     }
 }

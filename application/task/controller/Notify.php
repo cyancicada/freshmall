@@ -2,9 +2,9 @@
 
 namespace app\task\controller;
 
-use app\task\model\Order as OrderModel;
-use app\common\library\wechat\WxPay;
 use app\api\model\Order as ApiOrderModel;
+use app\common\library\wechat\WxPay;
+use app\task\model\Order as OrderModel;
 use think\Log;
 
 /**
@@ -25,35 +25,68 @@ class Notify
         $WxPay->notify(new OrderModel);
     }
 
-    public function mq()
+    /**
+     * MQ 完成订单
+     * @author kyang
+     */
+    public function receipt()
     {
-        $body = file_get_contents('php://input');
-        Log::info('php://input=>' . $body);
-        $request = json_decode($body);
-
-        Log::info('input=request:order_id'.$request->order_id);
-        Log::info('input=request:user_id'.$request->user_id);
-        if (isset($request->order_id) &&
-            !empty($request->order_id) &&
-            isset($request->user_id) &&
-            !empty($request->user_id)) {
+        $request = $this->parseRequest();
+        if (isset($request->order_id) && !empty($request->order_id) &&
+            isset($request->user_id) && !empty($request->user_id)) {
             try {
                 $model = ApiOrderModel::getUserOrderDetail($request->order_id, $request->user_id);
-                if (empty($model)) die('SUCCESS');
-                Log::info('input=pay_status:'.$model['pay_status']['value']);
-                switch (intval($model['pay_status']['value'])) {
-                    case 10:
-                        $model->cancel();
-                        break;
-                    case 20:
-                        $model->receipt();
-                        break;
+                if (empty($model)) throw new \Exception('订单不存在', 1);
+
+                if (intval($model['pay_status']['value']) != 20) {
+                    throw new \Exception('完成订单错误，ERROR[当前状态：' . $model['pay_status']['value'] . ']', 1);
                 }
+                $model->receipt();
+
             } catch (\Exception $exception) {
-                Log::info('input=Exception:'.$exception->getMessage());
+                Log::info('receipt order ERROR :' . $exception->getMessage());
             }
         }
         die('SUCCESS');
+    }
+
+    /**
+     * MQ 取消订单
+     * @author kyang
+     */
+    public function cancel()
+    {
+        $request = $this->parseRequest();
+        if (isset($request->order_id) && !empty($request->order_id) &&
+            isset($request->user_id) && !empty($request->user_id)) {
+            try {
+                $model = ApiOrderModel::getUserOrderDetail($request->order_id, $request->user_id);
+                if (empty($model)) throw new \Exception('订单不存在', 1);
+
+                if (intval($model['pay_status']['value']) != 10) {
+                    throw new \Exception('取消订单错误，ERROR[当前状态：' . $model['pay_status']['value'] . ']', 1);
+                }
+                $model->cancel();
+
+            } catch (\Exception $exception) {
+                Log::info('cancel order ERROR :' . $exception->getMessage());
+            }
+        }
+        die('SUCCESS');
+    }
+
+    /**
+     * 后期删除
+     * @deprecated
+     * @author kyang
+     */
+    public function mq() { die('SUCCESS'); }
+
+    private function parseRequest($array = false)
+    {
+        $body = file_get_contents('php://input');
+        Log::info('php://input=>' . $body);
+        return json_decode($body, $array);
     }
 
 }
