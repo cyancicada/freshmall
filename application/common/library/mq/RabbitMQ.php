@@ -95,7 +95,7 @@ class RabbitMQ
 
         $this->setUrlParam(['s' => '/task/notify/mq']);
 
-        if (isset($array['path']) && empty($array['path'])) $this->setUrlParam(['s' => $array['path']]);
+        if (isset($array['path']) && !empty($array['path'])) $this->setUrlParam(['s' => $array['path']]);
 
         $array['url'] = $this->fullUrl();
         self::$instance->getChannel()->basic_publish(new AMQPMessage(json_encode($array)), '', $this->queueName);
