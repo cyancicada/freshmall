@@ -6,11 +6,11 @@ namespace app\common\service;
 
 use app\api\model\Wxapp as WxappModel;
 use app\common\library\wechat\WxPay;
+use app\common\model\Balance as BalanceModel;
 use app\common\model\BalanceDetail;
 use app\task\model\Setting as SettingModel;
 use think\Db;
 use think\Log;
-use app\common\model\Balance as BalanceModel;
 
 class Balance
 {
@@ -90,17 +90,18 @@ class Balance
     public function chargeBalance($data)
     {
         try {
+            Db::startTrans();
+            $actualAmount = round(floatval($data['total_fee']) / 100, 2);
+            if ($actualAmount <= 0) throw new \Exception('实际充值金额为0：' . $data['out_trade_no']);
+
             $filter = ['trade_no' => $data['out_trade_no'], 'trade_status' => 'UNFINISHED'];
             $row    = BalanceDetail::get($filter);
             if (empty($row)) throw new \Exception('充值记录不存在：' . $data['out_trade_no']);
 
-            $chargeAmount = floatval($row['balance']);
-            if ($chargeAmount <= 0) throw new \Exception('充值金额不正确：' . $data['out_trade_no']);
+            $chargeAmount = $actualAmount; // 此时充值金额 等于微信返回的真实金额
+            $extraAmount  = self::extraAmount($chargeAmount); // 计算充值返多少
+            $chargeAmount += $extraAmount; // 最后应该充值多少
 
-            $extraAmount  = self::extraAmount($chargeAmount);
-            $chargeAmount += $extraAmount;
-
-            Db::startTrans();
             $balanceRow = BalanceModel::get(['user_id' => $row['user_id']]);
             if (!empty($balanceRow)) {
                 $balanceRow->setInc('balance', $chargeAmount);
@@ -113,6 +114,7 @@ class Balance
             }
             BalanceDetail::update([
                 'trade_status'   => 'FINISHED',
+                'actual_amount'  => $actualAmount, //微信返回的真实金额
                 'balance'        => $chargeAmount,
                 'extra'          => $extraAmount,
                 'latest_balance' => $this->myBalance($row['user_id'], true)
