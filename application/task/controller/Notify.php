@@ -39,7 +39,7 @@ class Notify
                 if (empty($model)) throw new \Exception('订单不存在', 1);
 
                 if (intval($model['pay_status']['value']) != 20) {
-                    throw new \Exception('完成订单错误，ERROR[当前状态：' . $model['pay_status']['value'] . ']', 1);
+                    throw new \Exception('完成订单错误，ERROR[当前支付状态：' . $model['pay_status']['value'] . ']', 1);
                 }
                 $model->receipt();
 
@@ -64,7 +64,10 @@ class Notify
                 if (empty($model)) throw new \Exception('订单不存在', 1);
 
                 if (intval($model['pay_status']['value']) != 10) {
-                    throw new \Exception('取消订单错误，ERROR[当前状态：' . $model['pay_status']['value'] . ']', 1);
+                    throw new \Exception('取消订单错误，ERROR[当前支付状态：' . $model['pay_status']['value'] . ']', 1);
+                }
+                if (intval(['order_status']['value']) == 20) {
+                    throw new \Exception('订单已经取消，无需再次取消，ERROR[当前订单状态：' . $model['order_status']['value'] . ']', 1);
                 }
                 $model->cancel();
 
