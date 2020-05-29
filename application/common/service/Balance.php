@@ -117,6 +117,7 @@ class Balance
                 'actual_amount'  => $actualAmount, //微信返回的真实金额
                 'balance'        => $chargeAmount,
                 'extra'          => $extraAmount,
+                'transaction_id' => $data['transaction_id'],
                 'latest_balance' => $this->myBalance($row['user_id'], true)
             ], $filter);
             Db::commit();

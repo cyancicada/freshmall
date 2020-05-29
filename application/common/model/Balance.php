@@ -2,7 +2,7 @@
 
 namespace app\common\model;
 
-use app\common\library\utils\SnowFlake;
+use app\common\library\utils\IDGenerate;
 
 /**
  * 商品分类模型
@@ -25,10 +25,7 @@ class Balance extends BaseModel
     ];
 
 
-    public static function buildTradeNo()
-    {
-        return 'B' . date('Ymd') . SnowFlake::nextId();
-    }
+    public static function buildTradeNo(){return IDGenerate::globalUniqueID('B');}
 
     /** 我的余额
      * @param $user_id
