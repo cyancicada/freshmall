@@ -55,6 +55,6 @@ services:
       environment:
         MINIO_ACCESS_KEY: kyangs
         MINIO_SECRET_KEY: a3lhbmdzX21pbmlv
-      command: server http://minio{1}/data{1}
+      command: minio server /data1
 networks:
   default:
