@@ -238,7 +238,7 @@ return [
     ],
     // mq 配置
     'mq'       => [
-        'host'       => '47.110.45.127',
+        'host'       => '47.93.98.132',
         'port'       => 5672,
         'user'       => 'admin',
         'password'   => 'admin123',
