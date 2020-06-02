@@ -23,30 +23,28 @@ class BaseModel extends Model
             '明天',
         ],
         [
-            '07:00~08:00',
-            '08:00~09:00',
-            '09:00~10:00',
-            '10:00~11:00',
-            '11:00~12:00',
-            '14:00~15:00',
-            '15:00~16:00',
-            '16:00~17:00',
-            '17:00~18:00',
-            '18:00~19:00',
+            '07:30~08:30',
+            '08:30~09:30',
+            '09:30~10:30',
+            '10:30~11:30',
+            //            '11:00~12:00',
+            '14:30~15:30',
+            '16:30~17:30',
+            '17:30~18:30',
+            //            '17:00~18:00',
+            //            '18:00~19:00',
         ]
     ];
 
     public static function calTimeRange()
     {
-        $key = - 1;
-        $d   = intval(date('H')) + 1;
-
-        if ($d >= 11 && $d <= 14) $d = 14;
+        $key = -1;
+        $hs   = date('H:i');
 
         foreach (self::$timeRange[1] as $index => $value) {
 
-            $tmp = explode('~', str_replace(':00','',$value));
-            if ($d >= intval($tmp[0]) && $d < intval($tmp[1])) {
+            list($start,$end) = explode('~', $value);
+            if ($hs <= $start) {
                 $key = $index;
                 break;
             }
@@ -56,6 +54,7 @@ class BaseModel extends Model
             $key == -1 ? 0 : $key,
         ];
     }
+
     /**
      * 模型基类初始化
      */
@@ -90,7 +89,7 @@ class BaseModel extends Model
      */
     protected static function setStoreWxappId()
     {
-        $session = Session::get('yoshop_store');
+        $session        = Session::get('yoshop_store');
         self::$wxapp_id = $session['wxapp']['wxapp_id'];
     }
 
@@ -99,7 +98,7 @@ class BaseModel extends Model
      */
     protected static function setApiWxappId()
     {
-        $request = Request::instance();
+        $request        = Request::instance();
         self::$wxapp_id = $request->param('wxapp_id');
     }
 
@@ -110,7 +109,7 @@ class BaseModel extends Model
     protected static function baseUrl()
     {
         $request = Request::instance();
-        $host = $request->scheme() . '://' . $request->host();
+        $host    = $request->scheme() . '://' . $request->host();
         $dirname = dirname($request->baseUrl());
         return empty($dirname) ? $host : $host . $dirname . '/';
     }

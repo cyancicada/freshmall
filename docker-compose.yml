@@ -45,5 +45,16 @@ services:
     volumes:
       - "./rabbit_consumer/logs:/tmp/apps/logs"
       - "./rabbit_consumer/config.json:/tmp/apps/config.json"
+
+  minio_1:
+    image: minio/minio
+      volumes:
+        - /root/minio/files:/data1
+      ports:
+        - "9999:9000"
+      environment:
+        MINIO_ACCESS_KEY: kyangs
+        MINIO_SECRET_KEY: a3lhbmdzX21pbmlv
+      command: minio server /data1
 networks:
   default:
