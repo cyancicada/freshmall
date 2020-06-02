@@ -165,6 +165,7 @@ class Order extends Controller
      */
     public function print()
     {
+        $orderSn = $this->request->post('order_sn');
         if ($this->request->isPost() && !empty($orderSn)) {
             $model = new OrderModel;
             foreach (explode(',', str_replace('，', ',', $orderSn)) as $sn) {
