@@ -62,13 +62,35 @@
 </div>
 
 <!-- 商品多规格模板 -->
-{{include file="balance_items" /}}
+{{include file="user/balance_items" /}}
 
 <script>
   var url = 'index.php?s=store/user/balanceItems';
 
 
   function balanceItems(nickName,userId) {
+    let balanceItemsElement = $('#balance_items');
+    $.ajax({
+      type: "post",
+      url: url,
+      async: true,
+      data: JSON.stringify({
+        user_id: userId,
+        nickName: nickName,
+      }),
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      success: function (r) {
+
+        balanceItemsElement.html(template('balance_items', {list: r.data, nickName: nickName}));
+        layer.open({
+          area: ['850px', '500px'],
+          title: '用户【' + nickName + '】余额明细',
+          btn: ['确定', '取消'],
+          content: balanceItemsElement.html(),
+        })
+      } // 注意不要在此行增加逗号
+    });
 
   }
 </script>

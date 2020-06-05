@@ -56,11 +56,8 @@ class User extends Controller
     public function balanceItems()
     {
         $request = Request::instance();
-        $userName = $request->get('nickName');
-        $list      = (new BalanceService)->myBill($request->get('user_id'));
-
-
-        return $this->renderSuccess($list);
+        $list      = (new BalanceService)->myBill($request->post('user_id'));
+        return $this->renderJson(1,'','',$list);
     }
 
 }
