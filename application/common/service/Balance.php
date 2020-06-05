@@ -151,7 +151,8 @@ class Balance
             $data   = (new BalanceDetail)->where($filter)->order(['create_time' => 'desc'])->select();
 
             foreach ($data as &$item) {
-                $item['type_name'] = isset(BalanceModel::$typeMap[$item['type']]) ? BalanceModel::$typeMap[$item['type']] : '其它';
+                $item['type_name']       = isset(BalanceModel::$typeMap[$item['type']]) ? BalanceModel::$typeMap[$item['type']] : '其它';
+                $item['balance_display'] = floatval($item['balance']) > 0 ? '+' . $item['balance'] : $item['balance'];
             }
             return $data;
         } catch (\Exception $exception) {

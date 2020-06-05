@@ -21,7 +21,7 @@
             <td class="am-text-middle">{{ $value.create_time }}</td>
             <td class="am-text-middle">{{ $value.actual_amount }}</td>
             <td class="am-text-middle">{{ $value.extra }}</td>
-            <td class="am-text-middle">{{ $value.balance }}</td>
+            <td class="am-text-middle">{{ $value.balance_display }}</td>
             <td class="am-text-middle">{{ $value.type_name }}</td>
             <td class="am-text-middle">{{ $value.latest_balance }}</td>
             <td class="am-text-middle">{{ $value.mark }}</td>
