@@ -3,6 +3,7 @@
 namespace app\common\model;
 
 use app\common\library\utils\IDGenerate;
+use think\Request;
 
 /**
  * 商品分类模型
@@ -44,5 +45,22 @@ class Balance extends BaseModel
             throw new \Exception('获取余额失败');
         }
 
+    }
+
+
+    /**
+     * 获取用户余额列表
+     * @return \think\Paginator
+     * @throws \think\exception\DbException
+     */
+    public function getList($filter = [])
+    {
+        $request = Request::instance();
+        $u = new User;
+        $data = $this->field(['b.balance','u.user_id','u.nickName','b.update_time'])
+            ->alias('b')->join($u->getTable().' u ','u.user_id=b.user_id')
+            ->order(['b.update_time' => 'desc'])->where($filter)
+            ->paginate(15, false, ['query' => $request->request()]);
+        return $data;
     }
 }

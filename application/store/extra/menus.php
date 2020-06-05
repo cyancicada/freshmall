@@ -102,6 +102,16 @@ return [
         'name' => '用户管理',
         'icon' => 'icon-user',
         'index' => 'user/index',
+        'submenu'=>[
+            [
+                'name' => '用户列表',
+                'index' => 'user/index',
+            ],
+            [
+                'name' => '用户余额',
+                'index' => 'user/balance',
+            ],
+        ]
     ],
 //    'marketing' => [
 //        'name' => '营销管理',

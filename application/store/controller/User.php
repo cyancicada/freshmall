@@ -2,6 +2,8 @@
 
 namespace app\store\controller;
 
+use app\common\model\Balance;
+use app\common\service\Balance as BalanceService;
 use app\store\model\User as UserModel;
 use think\Request;
 
@@ -28,6 +30,37 @@ class User extends Controller
 
         $list = $model->getList($filter);
         return $this->fetch('index', compact('list'));
+    }
+    /**
+     * 用户余额列表
+     * @return mixed
+     * @throws \think\exception\DbException
+     */
+    public function balance()
+    {
+        $request = Request::instance();
+        $filter = [];
+        if ($username = $request->get('username')){
+            $filter['nickName']=['like','%'.$username.'%'];
+        }
+        $model = new Balance;
+
+        $list = $model->getList($filter);
+        return $this->fetch('balance', compact('list'));
+    }
+    /**
+     * 用户余额明细
+     * @return mixed
+     * @throws \Exception
+     */
+    public function balanceItems()
+    {
+        $request = Request::instance();
+        $userName = $request->get('nickName');
+        $list      = (new BalanceService)->myBill($request->get('user_id'));
+
+
+        return $this->renderSuccess($list);
     }
 
 }
