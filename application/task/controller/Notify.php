@@ -112,8 +112,13 @@ class Notify
                         'accept_phone'  => $request->accept_phone,
                     ];
                 }
+                $templateParams = [];
 
-                $success = (new SmsDriver($config))->sendSms($request->type, $request->templateParams);
+                foreach ($request->templateParams as $k => $v) $templateParams[$k] = $v;
+
+                $success = (new SmsDriver($config))->sendSms($request->type, $templateParams);
+                Log::info('$templateParams Array ==');
+                Log::info(var_export($templateParams,true));
                 if (!$success) Log::error('sms ERROR ');
                 return $success;
 
