@@ -46,7 +46,7 @@ function yoshop_hash($password)
 function base_url()
 {
     $request = Request::instance();
-    $subDir = str_replace('\\', '/', dirname($request->server('PHP_SELF')));
+    $subDir  = str_replace('\\', '/', dirname($request->server('PHP_SELF')));
     return $request->scheme() . '://' . $request->host() . $subDir . ($subDir === '/' ? '' : '/');
 }
 
@@ -113,10 +113,10 @@ if (!function_exists('array_column')) {
                 $result[] = is_object($subArray) ? $subArray->$columnKey : $subArray[$columnKey];
             } elseif (array_key_exists($indexKey, $subArray)) {
                 if (is_null($columnKey)) {
-                    $index = is_object($subArray) ? $subArray->$indexKey : $subArray[$indexKey];
+                    $index          = is_object($subArray) ? $subArray->$indexKey : $subArray[$indexKey];
                     $result[$index] = $subArray;
                 } elseif (array_key_exists($columnKey, $subArray)) {
-                    $index = is_object($subArray) ? $subArray->$indexKey : $subArray[$indexKey];
+                    $index          = is_object($subArray) ? $subArray->$indexKey : $subArray[$indexKey];
                     $result[$index] = is_object($subArray) ? $subArray->$columnKey : $subArray[$columnKey];
                 }
             }
@@ -134,7 +134,7 @@ if (!function_exists('array_column')) {
 function array_merge_multiple($array1, $array2)
 {
     $merge = $array1 + $array2;
-    $data = [];
+    $data  = [];
     foreach ($merge as $key => $val) {
         if (
             isset($array1[$key])
@@ -164,7 +164,7 @@ function getGuidV4($trim = true)
     }
     // OSX/Linux
     if (function_exists('openssl_random_pseudo_bytes') === true) {
-        $data = openssl_random_pseudo_bytes(16);
+        $data    = openssl_random_pseudo_bytes(16);
         $data[6] = chr(ord($data[6]) & 0x0f | 0x40);    // set version to 0100
         $data[8] = chr(ord($data[8]) & 0x3f | 0x80);    // set bits 6-7 to 10
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
@@ -186,15 +186,16 @@ function getGuidV4($trim = true)
 }
 
 
-if (!function_exists('dd')){
+if (!function_exists('dd')) {
 
 
-    function dd($val = ''){
+    function dd($val = '', $die = true)
+    {
 
         echo '<pre>';
 
         print_r($val);
 
-        die('</pre>');
+        $die ? die('</pre>') : null;
     }
 }
