@@ -11,21 +11,6 @@ use app\task\model\Setting as SettingModel;
 
 class NotifyService
 {
-
-    /**
-     * 发送短信通知
-     * @param $wxapp_id
-     * @param $order_no
-     * @return mixed
-     * @throws \think\Exception
-     */
-    public static function sendSms($wxapp_id, $order_no)
-    {
-        // 短信配置信息
-        $config = SettingModel::getItem('sms', $wxapp_id);
-        return (new SmsDriver($config))->sendSms('order_pay', compact('order_no'));
-    }
-
     /**
      * 支付完成更新订单
      * @param $outTradeNo
@@ -40,12 +25,16 @@ class NotifyService
         if (empty($order)) throw new \Exception('订单不存在');
         // 更新订单状态
         $order->updatePayStatus($transactionId, $userBalance);
-        // 发送短信通知
-        self::sendSms($order['wxapp_id'], $order['order_no']);
         //记录已经支付的id，供打印机打印
         $order->findPrintOrderNoOrCreate($order['order_no']);
-
-        self::pushOrderMegToMQ($order, 'trade.order.receive_days', '/task/notify/receipt');
+        // 发送订单确认 MQ
+        self::pushOrderMegToMQ($order, '/task/notify/receipt', 'trade.order.receive_days');
+        // 发送短信通知 MQ
+        self::pushOrderMegToMQ([
+            'type'           => 'order_pay',
+            'wxapp_id'       => $order['wxapp_id'],
+            'templateParams' => ['order_no' => $order['order_no']],
+        ], '/task/notify/sms');
     }
 
 
@@ -56,7 +45,7 @@ class NotifyService
      * @param int $retryTime
      * @author kyang
      */
-    public static function pushOrderMegToMQ($data, $settingKey, $path = '', $retryTime = 0)
+    public static function pushOrderMegToMQ($data, $path = '', $settingKey = '', $retryTime = 0)
     {
         $day = 0;
         if (!empty($settingKey)) {

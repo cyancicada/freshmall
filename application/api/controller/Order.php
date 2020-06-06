@@ -64,11 +64,11 @@ class Order extends Controller
                     NotifyService::updateOrder($model['order_no'], BalanceModel::buildTradeNo(), true);
                     return $this->renderSuccess($model, '支付成功');
                 } catch (\Exception $exception) {
-                    $m = $exception->getCode() == 1 ? $exception->getMessage():'支付失败';
+                    $m = $exception->getCode() == 1 ? $exception->getMessage() : '支付失败';
                     return $this->renderError($m);
                 }
             }
-            NotifyService::pushOrderMegToMQ($model, 'trade.order.close_days','/task/notify/cancel');
+            NotifyService::pushOrderMegToMQ($model, '/task/notify/cancel', 'trade.order.close_days');
             // 发起微信支付
             return $this->renderSuccess([
                 'payment'  => $this->wxPay($model['order_no'], $this->user['open_id']
@@ -113,7 +113,7 @@ class Order extends Controller
                     NotifyService::updateOrder($model['order_no'], BalanceModel::buildTradeNo(), true);
                     return $this->renderSuccess($model, '支付成功');
                 } catch (\Exception $exception) {
-                    $m = $exception->getCode() == 1 ? $exception->getMessage():'支付失败';
+                    $m = $exception->getCode() == 1 ? $exception->getMessage() : '支付失败';
                     return $this->renderError($m);
                 }
             }

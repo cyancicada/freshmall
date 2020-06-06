@@ -61,12 +61,14 @@
                             <tbody>
                             <tr>
                                 <th>订单号</th>
+                                <th>订单备注</th>
                                 <th>实付款</th>
                                 <th>买家</th>
                                 <th>交易状态</th>
                             </tr>
                             <tr>
                                 <td><?= $detail['order_no'] ?></td>
+                                <td><?= $detail['remark'] ?></td>
                                 <td>
                                     <p>￥<?= $detail['pay_price'] ?></p>
                                     <p class="am-link-muted">(含运费：￥<?= $detail['express_price'] ?>)</p>

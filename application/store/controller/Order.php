@@ -4,7 +4,9 @@ namespace app\store\controller;
 
 use app\common\model\BaseModel;
 use app\store\model\Order as OrderModel;
+use app\store\model\OrderAddress;
 use app\store\model\User;
+use app\task\service\NotifyService;
 
 /**
  * 订单管理
@@ -83,8 +85,8 @@ class Order extends Controller
 
     /** 构建订单查询条件
      * @param array $filter
-     * @throws \think\exception\DbException
      * @return array
+     * @throws \think\exception\DbException
      */
     public function buildFilter($filter = [])
     {
@@ -97,7 +99,7 @@ class Order extends Controller
 
         if (!empty($claimTime)) {
             list($start, $end) = explode(' ~ ', $claimTime);
-            $filter['claim_delivery_time'] = ['between',[trim($start),trim($end)]];
+            $filter['claim_delivery_time'] = ['between', [trim($start), trim($end)]];
         }
         if (!empty($range)) $filter['claim_time_range'] = $range;
 
@@ -113,6 +115,7 @@ class Order extends Controller
         }
         return $filter;
     }
+
     /**
      * 订单列表
      * @param $title
@@ -127,7 +130,7 @@ class Order extends Controller
         $list   = $model->getList($filter);
 
         $range = BaseModel::$timeRange;
-        return $this->fetch('index', compact('title', 'list','range'));
+        return $this->fetch('index', compact('title', 'list', 'range'));
     }
 
     /**
@@ -176,6 +179,7 @@ class Order extends Controller
         }
         return $this->fetch('print');
     }
+
     /** 订单打印
      * @param null $order_id
      * @return array
@@ -187,21 +191,28 @@ class Order extends Controller
             $orderNo = $this->request->post('orderNo');
             $amount  = $this->request->post('amount');
             $mark    = $this->request->post('mark');
-
-
-            $order = OrderModel::get(['order_no' => $orderNo]);
+            $order   = OrderModel::get(['order_no' => $orderNo]);
             if (empty($order)) return $this->renderError('订单不存在');
 
-            if ($order['is_refund'] == 'Y') return $this->renderError('此订单已退款，勿重复操作！！！' );
-
+            if ($order['is_refund'] == 'Y') return $this->renderError('此订单已退款，勿重复操作！！！');
             if (floatval($amount) > floatval($order['pay_price'])) {
                 return $this->renderError('最高可退金额不可超过订单支付金额：' . $order['pay_price']);
             }
             try {
+
                 $order->startTrans();
                 $order->consumerBalance($order['user_id'], $amount, $orderNo, $mark, true);
                 $order->save(['is_refund' => 'Y']);
                 $order->commit();
+                $address = OrderAddress::get(['order_id' => $order['order_id']]);
+                // 发送短信通知 MQ
+                NotifyService::pushOrderMegToMQ([
+                    'type'           => 'refund',
+                    'accept_phone'   => $address['phone'],
+                    'wxapp_id'       => $order['wxapp_id'],
+                    'template_code'  => 'SMS_192571078',
+                    'templateParams' => ['product' => $order['order_no']],
+                ], '/task/notify/sms');
                 return $this->renderSuccess('退款成功');
             } catch (\Exception $exception) {
                 $order->rollback();
