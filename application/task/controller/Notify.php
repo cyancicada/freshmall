@@ -115,11 +115,11 @@ class Notify
                 $templateParams = [];
 
                 foreach ($request->templateParams as $k => $v) $templateParams[$k] = $v;
-
-                $success = (new SmsDriver($config))->sendSms($request->type, $templateParams);
-                Log::info('$templateParams Array ==');
+                $smsDriver = new SmsDriver($config);
+                $success   = $smsDriver->sendSms($request->type, $templateParams);
+                Log::info('templateParams Array ==');
                 Log::info(var_export($templateParams,true));
-                if (!$success) Log::error('sms ERROR ');
+                if (!$success) Log::error('sms ERROR ' . $smsDriver->getError());
                 return $success;
 
             } catch (\Exception $exception) {
